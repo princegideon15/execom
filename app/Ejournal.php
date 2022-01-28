@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Ejournal extends Model
+class Ejournal extends Modelasdas
 {
     protected $connection = 'dbej';
 
