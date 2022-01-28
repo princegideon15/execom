@@ -9,7 +9,7 @@ class Ejournal extends Model
 {
     protected $connection = 'dbej';
 
-    static function count_journals(){
+    static function count_journals(){   
        return DB::connection('dbej')->table('tbljournals')->count();
     }
 
