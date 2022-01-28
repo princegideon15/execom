@@ -9,6 +9,8 @@ class Ejournal extends Model
 {
     protected $connection = 'dbej';
 
+    // sample palabasin sa github
+
     static function count_journals(){   
        return DB::connection('dbej')->table('tbljournals')->count();
     }
