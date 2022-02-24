@@ -198,36 +198,6 @@ class Member extends Model
         'GROUP BY emp_usr_id '.
         ') as q');  
 
-        // $query = DB::select('SELECT *, TITLE, PROVINCE, CITY, sex '.
-        // 'FROM ( SELECT pp.*, (select title_name from new_dbskms.tbltitles where title_id like pp_title) as TITLE, '.
-        // '(select province_name from new_dbskms.tblprovinces where province_id like emp_province) as PROVINCE, '.
-        // '(select city_name from new_dbskms.tblcities where city_id like emp_city) as CITY, '.
-        // '(select sex from new_dbskms.tblsex where s_id like pp_sex) as sex, '.
-        // 'COUNT(case when emp_period_to = "Present" then emp_period_to end) as PRESENT  '.
-        // 'FROM new_dbskms.tblemployments '.
-        // 'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        // 'LEFT JOIN new_dbskms.tblpersonal_profiles as pp ON pp_usr_id = emp_usr_id '.
-        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        // 'LEFT JOIN new_dbskms.tblregions ON emp_region = region_id '.
-        // 'WHERE usr_grp_id like 3  AND (mem_status != 3 AND mem_status != "" AND mem_status != 0) '.
-        // 'AND emp_region = '. $id . ' '.
-        // 'GROUP BY emp_usr_id having PRESENT > 0 '.
-        // 'UNION ALL '.
-        // 'SELECT pp.*,  (select title_name from new_dbskms.tbltitles where title_id like pp_title) as TITLE, '.
-        // '(select province_name from new_dbskms.tblprovinces where province_id like emp_province) as PROVINCE, '.
-        // '(select city_name from new_dbskms.tblcities where city_id like emp_city) as CITY, '.
-        // '(select sex from new_dbskms.tblsex where s_id like pp_sex) as sex, '.
-        // 'COUNT(CASE WHEN emp_period_to = "Present" THEN emp_period_to END) as PRESENT '.
-        // 'FROM new_dbskms.tblemployments '.
-        // 'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        // 'LEFT JOIN new_dbskms.tblpersonal_profiles as pp ON pp_usr_id = emp_usr_id '.
-        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        // 'LEFT JOIN new_dbskms.tblregions ON emp_region = region_id '.
-        // 'WHERE usr_grp_id like 3  AND (mem_status != 3 AND mem_status != "" AND mem_status != 0) '.
-        // 'AND emp_region = '. $id . ' '.
-        // 'GROUP BY emp_usr_id HAVING PRESENT = 0 '.
-        // ') as q');  
-        
         return $query; 
     }
 
