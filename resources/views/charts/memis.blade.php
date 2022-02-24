@@ -13,7 +13,8 @@
     <div class="card text-white bg-secondary mb-3">
       <div class="card-body">
         <h3 class="card-title font-weight-bold">MEMBERSHIP INFORMATION SYSTEM (MemIS)</h3>
-        <p class="card-text">A repository of profile of Filipino researchers, scholars, scientest and engineers.</p>
+        <p class="card-text">A repository of profile of Filipino researchers.</p>
+        
       </div>
     </div>
     <hr/>
@@ -48,6 +49,7 @@
               @foreach($category_list as $row)
               <option value="{{ $row->membership_type_id }}">{{ $row->membership_type_name }}</option>
               @endforeach
+              <option value="9">New Members Only</option>
             </select>
           </div>
         </div>
@@ -350,6 +352,12 @@
       <li class="nav-item" role="presentation">
         <a class="nav-link disabled" onclick="memis_generate_chart(6)" id="bar_drilldown_tab" data-toggle="tab" href="#bar_drilldown_bar" role="tab" aria-controls="bar_drilldown_bar" aria-selected="false">Bar with Drilldown</a>
       </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link disabled" onclick="memis_generate_chart(7)" id="adv_stacked_col_tab" data-toggle="tab" href="#adv_sc_bar" role="tab" aria-controls="adv_sc_bar" aria-selected="false">Advanced Stacked-Column Bar</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link disabled" onclick="memis_generate_chart(8)" id="line_tab" data-toggle="tab" href="#line_bar" role="tab" aria-controls="line_bar" aria-selected="false">Line Chart</a>
+      </li>
     </ul>
     <div class="tab-content" id="graph_tab_content">
       <div class="tab-pane fade show active" id="basic_bar" role="tabpanel" aria-labelledby="basic_bar_tab">
@@ -369,6 +377,12 @@
       </div>
       <div class="tab-pane fade" id="bar_drilldown_bar" role="tabpanel" aria-labelledby="bar_drilldown_tab">
         <div class="w-100 mt-3" id="container6"style="width:100%; height:auto;"></div>
+      </div>
+      <div class="tab-pane fade" id="adv_sc_bar" role="tabpanel" aria-labelledby="adv_sc_bar">
+        <div class="w-100 mt-3" id="container7"style="width:100%; height:auto;"></div>
+      </div>
+      <div class="tab-pane fade" id="line_bar" role="tabpanel" aria-labelledby="line_bar">
+        <div class="w-100 mt-3" id="container8"style="width:100%; height:auto;"></div>
       </div>
       <div class="row pl-3 mt-3 mb-2">
           <div class="col-2 font-weight-bold">Count/Percentage:</div>

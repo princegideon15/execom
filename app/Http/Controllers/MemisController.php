@@ -429,10 +429,23 @@ class MemisController extends Controller
                 array_push($filters, $value);
             }
         }
-        // $all = count($filters);
-        // return Member::do_stack_graph($req, $all);
         return Member::do_column_graph($req);
         
+    }
+
+    public function do_advance_stack_column_graph(){
+        return Member::do_advance_stack_column_graph();
+    }
+
+    public function do_line_graph(Request $req){
+
+        $filters = array();
+        foreach($req->all() as $key => $value) {
+            if($key != 'radio_generate_chart' && $value > 0){
+                array_push($filters, $value);
+            }
+        }
+        return Member::do_line_graph($req);
     }
 
     public function drilldown_region(Request $req){

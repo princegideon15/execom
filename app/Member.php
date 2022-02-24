@@ -5215,6 +5215,30 @@ class Member extends Model
         return DB::select($select);
     }
 
+    static function do_advance_stack_column_graph(){
+        $result_array = array();
+
+        $output = DB::connection('dbskms')->table('tbldivisions')
+            ->select('div_id')
+            ->get();
+
+            
+        foreach($output as $row){  
+            $result_array[] =  array($row->div_id => array('Male' => Member::get_advance_region($row->div_id, '1')));
+            // $result_array[] =  array($row->div_id => array('Female' => Member::get_advance_region($row->div_id, '2')));
+        }
+        
+        foreach($output as $row){  
+            // $result_array[] =  array($row->div_id => array('Male' => Member::get_advancec_region($row->div_id, '1')));
+            $result_array[] =  array($row->div_id => array('Female' => Member::get_advance_region($row->div_id, '2')));
+        }
+
+
+      
+        return $result_array;
+
+    }
+
     // column graph
     static function do_column_graph($req){ 
         $result_array = array();
@@ -5416,6 +5440,92 @@ class Member extends Model
 
         return $result_array;
     } 
+
+    // line graph
+    static function do_line_graph($req){ 
+        $result_array = array();
+
+        if($req->memis_division == '999'){
+            
+            $output = DB::connection('dbskms')->table('tbldivisions')
+            ->select('div_id','div_name')
+            ->get();
+
+            foreach($output as $row){  
+                $result_array[] = array($row->div_id => array($row->div_name => Member::get_line_division($row->div_id, $req)));
+            }
+        }
+
+        if($req->memis_region == '999'){
+
+            $query = DB::connection('dbskms')->table('tblregions')
+            ->select('region_id','region_name');
+
+            if($req->memis_region == '999'){
+                $output = $query->get();
+            }else{
+                $output = $query->where('region_id', $req->memis_region)
+                ->get();
+
+            }   
+
+            foreach($output as $row){  
+                $result_array[] = array($row->region_id => array($row->region_name => Member::get_line_region($row->region_id, $req)));
+            }
+        }
+
+
+        return $result_array;
+    } 
+
+    public static function get_advance_region($id, $flag){
+        
+        $deceased = ' AND mem_status != 3 ';
+
+        // 1st
+        // $select = 'SELECT COUNT(*) AS total, concat("Division ",div_number) AS division, sex '.
+        // 'FROM new_dbskms.tblpersonal_profiles '.
+        // 'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
+        // 'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id '. 
+        // 'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '. 
+        // 'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '. 
+        // 'WHERE pp_sex = '. $flag . 
+        // ' AND emp_region LIKE '. $id . 
+        // ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments) '.
+        // 'AND usr_grp_id LIKE 3 '. $deceased .
+        // 'GROUP BY mem_div_id ';
+
+        // //2nd
+
+        // $select = 'SELECT CONCAT("Division ",div_number) as division, '.  
+        // '(SELECT count(*) '. 
+        // 'FROM new_dbskms.tblpersonal_profiles '.  
+        // 'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.  
+        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.   
+        // 'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id '.  
+        // 'WHERE pp_sex LIKE '. $flag .  
+        // ' AND emp_region LIKE '. $id .
+        // ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments) '. $deceased .
+        // ' AND usr_grp_id LIKE 3  AND mem_status != 3 AND mem_div_id LIKE div_id) AS total '. 
+        // 'from new_dbskms.tbldivisions';
+
+        //3rd
+        $select = 'SELECT region_id, '.
+        '(SELECT count(*) '.
+        'FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
+        'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id '.
+        'WHERE pp_sex LIKE '. $flag .
+        ' AND mem_div_id LIKE '. $id .
+        ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments) '. $deceased .
+        ' AND usr_grp_id LIKE 3  AND mem_status != 3 and emp_region like region_id) as total '.
+        'FROM new_dbskms.tblregions';
+        
+        return DB::select($select);
+    
+    }
 
     // specific age for column with year
     public static function get_spec_age($id, $req){
@@ -6897,5 +7007,219 @@ class Member extends Model
         //     // }
 
         // }
+
+    public static function get_line_division($id, $req){
+
+        $select = '';
+        $years = $req->memis_end_year - $req->memis_start_year;
+        $year = $req->memis_start_year;
+        $union = '';
+        $deceased = ' AND mem_status != 3 ';
+        $where = ' AND mem_div_id LIKE '. $id;
+        $join = '';
+        $case = '';
+        $field = '';
+        $having = '';
+        $group_by = ' ';
+
+        
+        $join .= ' JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id ';
+
+        if($req->memis_category > 0 && $req->memis_category != '999'){
+            // $join .= ' JOIN new_dbskms.tblmembership_types ON membership_type_id = mem_type ';
+            if($req->memis_category == 9){
+                $where .= ' AND (mem_type LIKE 1 OR mem_type LIKE 2) ';
+            }else{
+                $where .= ' AND mem_type LIKE ' . $req->memis_category . ' ';
+            }
+        }
+        
+        if($req->memis_sex > 0 && $req->memis_sex != '999'){
+            $where .= ' AND pp_sex LIKE ' . $req->memis_sex . ' ';
+        }
+
+        if($req->memis_period > 0){
+
+            if($req->memis_year > 0){
+                $where .= ' AND YEAR(mem_date_elected) = ' . $req->memis_year;
+            }else{
+                $where .= ' AND YEAR(mem_date_elected) = ' . date("Y");
+            }
+
+
+            if($req->memis_period == 1){ // monthly
+
+                for($i=1; $i<=12;$i++){
+                    if($i < 12){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+        
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(MONTH(mem_date_elected),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND MONTH(mem_date_elected) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                }  
+            }else if($req->memis_period == 2){ // quarterly
+
+                for($i=1; $i<=4;$i++){
+                    if($i < 4){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+        
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(QUARTER(mem_date_elected),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND QUARTER(mem_date_elected) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                }  
+            }else if($req->memis_period == 3){ // semestral 
+
+                for($i=1; $i<=2;$i++){
+                    if($i < 2){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+                    
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(IF(MONTH(mem_date_elected) < 7, 1, 2),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND IF(MONTH(mem_date_elected) < 7, 1, 2) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                } 
+            }
+        }else{
+
+            for($i=0; $i<=$years;$i++){
+                if($i < $years){
+                    $union = 'UNION';
+                }else{
+                    $union = '';
+                }
+    
+                $select .= 'SELECT count(mem_usr_id) as total, IFNULL(YEAR(mem_date_elected),'. $year .') AS label '. $field . 
+                'FROM new_dbskms.tblmembers '. 
+                'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                'WHERE usr_grp_id LIKE 3 '. $where . $deceased .
+                'AND YEAR(mem_date_elected) = '. $year . ' ' . $having . ' ' . $group_by . ' ' . $union . ' ';
+    
+                $year++;
+            }
+        }
+        
+        return DB::select($select);
+               
+    }
+
+    public static function get_line_region($id, $req){
+
+        $select = '';
+        $years = $req->memis_end_year - $req->memis_start_year;
+        $year = $req->memis_start_year;
+        $union = '';
+        $deceased = ' AND mem_status != 3 ';
+        $where = ' AND emp_region LIKE '. $id;
+        $join = '';
+        $case = '';
+        $field = '';
+        $having = '';
+        $group_by = '';
+
+        
+        $join .= ' JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id ';
+        $join .= ' JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id ';
+        $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments)';   
+
+
+        if($req->memis_category > 0 && $req->memis_category != '999'){
+            // $join .= ' JOIN new_dbskms.tblmembership_types ON membership_type_id = mem_type ';
+            if($req->memis_category == 9){
+                $where .= ' AND (mem_type LIKE 1 OR mem_type LIKE 2) ';
+            }else{
+                $where .= ' AND mem_type LIKE ' . $req->memis_category . ' ';
+            }
+        }
+        
+        if($req->memis_sex > 0 && $req->memis_sex != '999'){
+            $where .= ' AND pp_sex LIKE ' . $req->memis_sex . ' ';
+        }
+
+        if($req->memis_period > 0){
+
+            if($req->memis_year > 0){
+                $where .= ' AND YEAR(mem_date_elected) = ' . $req->memis_year;
+            }else{
+                $where .= ' AND YEAR(mem_date_elected) = ' . date("Y");
+            }
+
+
+            if($req->memis_period == 1){ // monthly
+
+                for($i=1; $i<=12;$i++){
+                    if($i < 12){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+        
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(MONTH(mem_date_elected),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND MONTH(mem_date_elected) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                }  
+            }else if($req->memis_period == 2){ // quarterly
+
+                for($i=1; $i<=4;$i++){
+                    if($i < 4){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+        
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(QUARTER(mem_date_elected),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND QUARTER(mem_date_elected) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                }  
+            }else if($req->memis_period == 3){ // semestral 
+
+                for($i=1; $i<=2;$i++){
+                    if($i < 2){
+                        $union = 'UNION';
+                    }else{
+                        $union = '';
+                    }
+                    
+                    $select .= 'SELECT count(mem_usr_id) as total, IFNULL(IF(MONTH(mem_date_elected) < 7, 1, 2),'.$i.') AS label '.  
+                    'FROM new_dbskms.tblmembers '. 
+                    'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                    'WHERE usr_grp_id LIKE 3 AND IF(MONTH(mem_date_elected) < 7, 1, 2) = '. $i . ' ' . $where . $deceased . ' ' . $union . ' ';
+                } 
+            }
+        }else{
+
+            for($i=0; $i<=$years;$i++){
+                if($i < $years){
+                    $union = 'UNION';
+                }else{
+                    $union = '';
+                }
+
+                $select .= 'SELECT count(mem_usr_id) as total, IFNULL(YEAR(mem_date_elected),'. $year .') AS label '. $field . 
+                'FROM new_dbskms.tblmembers '. 
+                'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
+                'WHERE usr_grp_id LIKE 3 '. $where . $deceased .
+                ' AND YEAR(mem_date_elected) = '. $year . ' ' . $having . ' ' . $group_by . ' ' . $union . ' ';
+
+                $year++;
+            }
+        }
+
+        return DB::select($select);  
+    }
+
+    
 
 }

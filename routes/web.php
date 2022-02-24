@@ -137,7 +137,9 @@ Route::post('/memis/bar_graph', 'MemisController@do_bar_graph');
 Route::any('/memis/stack_graph', 'MemisController@do_stack_graph');
 Route::any('/memis/column_graph', 'MemisController@do_column_graph');
 Route::any('/memis/stack_column_graph', 'MemisController@do_column_graph');
+Route::any('/memis/advance_stack_column_graph', 'MemisController@do_advance_stack_column_graph');
 Route::post('/memis/drilldown/region', 'MemisController@drilldown_region');
+Route::post('/memis/line_graph', 'MemisController@do_line_graph');
 
 // memis graph specific
 
