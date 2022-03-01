@@ -12,10 +12,18 @@ use App\Research;
 use App\Logs;
 use Auth;
 
+/**
+ * Manage quick and advance search
+ */
 class SearchController extends Controller
 {
     private $ipaddress;
 
+    /**
+     * Get IP address of the users
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -36,6 +44,12 @@ class SearchController extends Controller
             return $ipaddress;
     }
     
+    /**
+     * Quick search in MemIS
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search_overall_memis(Request $req){
 
         $data = $req->search;
@@ -113,6 +127,12 @@ class SearchController extends Controller
             }
     }
 
+    /**
+     * Quick search in BRIS
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search_overall_bris(Request $req){
         
         $data = $req->search;
@@ -140,6 +160,12 @@ class SearchController extends Controller
         
     }
 
+    /**
+     * Quick search in eJournal
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search_overall_ejournal(Request $req){
 
         $data = $req->search;
@@ -163,6 +189,12 @@ class SearchController extends Controller
         }
     }
 
+    /**
+     * Quick search in LMS
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search_overall_lms(Request $req){
 
         $data = $req->search;
@@ -190,6 +222,12 @@ class SearchController extends Controller
     
     }
 
+    /**
+     * Quick search in NRCPnet
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search_overall_nrcpnet(Request $req){
 
         $data = $req->search;
@@ -213,7 +251,12 @@ class SearchController extends Controller
         }          
     }
 
-
+    /**
+     * Advance search
+     *
+     * @param Request $req
+     * @return void
+     */
     public function search(Request $req){
         $data = $req->search;
 
@@ -472,10 +515,6 @@ class SearchController extends Controller
     public function get_divisions(){
         return Search::get_divisions();
     }
-
-    // public function get_brgy(Request $req){
-    //     return Search::get_brgys($req->id);
-    // }
 }
 
 

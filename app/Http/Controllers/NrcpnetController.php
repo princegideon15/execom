@@ -7,11 +7,19 @@ use App\Nrcpnet;
 use App\Logs;
 use Auth;
 
+/**
+ * manages NRCPnet data
+ */
 class NrcpnetController extends Controller
 {
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -32,6 +40,12 @@ class NrcpnetController extends Controller
             return $ipaddress;
     }
 
+    /**
+     * Get plantilla personnels
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_plant(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -50,6 +64,12 @@ class NrcpnetController extends Controller
 
     }
 
+    /**
+     * Get contractual personnels
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_cont(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -67,6 +87,12 @@ class NrcpnetController extends Controller
 
     }
 
+    /**
+     * Get job order personnels
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_jo(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -84,6 +110,12 @@ class NrcpnetController extends Controller
 
     }
 
+    /**
+     * Get vacant positions
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_vac(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -101,6 +133,11 @@ class NrcpnetController extends Controller
 
     }
 
+    /**
+     * Get departments
+     *
+     * @return void
+     */
     public function get_divs(){
         return Nrcpnet::get_plantilla_group();
     }

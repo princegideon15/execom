@@ -8,12 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Auth;
 
-
+/**
+ * Manages feedbacks of ExeCom IS users
+ */
 class FeedbackController extends Controller
 {
     private $table = 'tblfeedbacks';
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -55,7 +60,7 @@ class FeedbackController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store UI/UX feedback of internal users
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -134,7 +139,6 @@ class FeedbackController extends Controller
     }
 
     public function verify(){
-// return Auth::id();
         $output = Feedback::where('fb_usr_id', Auth::user()->user_id)->first();
         if($output != ''){
             return 1;

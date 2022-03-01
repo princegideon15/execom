@@ -11,11 +11,19 @@ use Auth;
 use Response;
 use Storage;
 
+/**
+ * Manages LMS data
+ */
 class LmsController extends Controller
 {
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -84,7 +92,12 @@ class LmsController extends Controller
         return Library::get_category($req->cat);
     }
 
-
+    /**
+     * Download PDF files if available
+     *
+     * @param [type] $id
+     * @return void
+     */
     public function download_file($id){
 
         $cat = Library::get_cat_label($id);
@@ -112,6 +125,12 @@ class LmsController extends Controller
         return response()->download(storage_path("app/{$file}"))->deleteFileAfterSend(true);
     }
 
+    /**
+     * Get PDF
+     *
+     * @param [type] $id
+     * @return void
+     */
     public function view_pdf($id){
 
         $cat = Library::get_cat_label($id);

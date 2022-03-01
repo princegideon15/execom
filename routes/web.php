@@ -142,7 +142,6 @@ Route::post('/memis/drilldown/region', 'MemisController@drilldown_region');
 Route::post('/memis/line_graph', 'MemisController@do_line_graph');
 
 // memis graph specific
-
 Route::post('/memis/bar_graph_by_id', 'MemisController@do_bar_graph_by_id');
 
 

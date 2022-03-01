@@ -17,16 +17,21 @@ use Cookie;
 use Auth;
 use App\Charts\FeedbackChart;
 
-
-//include(app_path() . '\Colors\RandomColor.php'); // local
-// include(app_path() . '/Colors/RandomColor.php'); // server
 use \Colors\RandomColor;
 
+/**
+ * Manages displays in dashboard
+ */
 class HomeController extends Controller
 {
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -122,10 +127,21 @@ class HomeController extends Controller
                                     'count_feedback', 'tables'));
     }
 
+    /**
+     * Get ExeCom users
+     *
+     * @return void
+     */
     public function get_users(){
         return Execom::get_users();
     }
 
+    /**
+     * Add user from MemIS members (disabled temporarily)
+     *
+     * @param Request $req
+     * @return void
+     */
     public function add_user(Request $req){
 
         $logs = array('log_user_id' => Auth::user()->user_id, 
@@ -139,6 +155,12 @@ class HomeController extends Controller
         return Execom::add_user($req->id);
     }
 
+    /**
+     * Remove user
+     *
+     * @param Request $req
+     * @return void
+     */
     public function remove_user(Request $req){
 
         $logs = array('log_user_id' => Auth::user()->user_id, 
@@ -152,6 +174,12 @@ class HomeController extends Controller
         return Execom::remove_user($req->id);
     }
 
+    /**
+     * Add ExeCom IS user
+     *
+     * @param Request $req
+     * @return void
+     */
     public function create_user(Request $req){
 
    

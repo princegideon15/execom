@@ -8,15 +8,28 @@ use App\Research;
 use App\Logs;
 use Auth;
 
-include(app_path() . '\Colors\RandomColor.php'); // local
-// include(app_path() . '/Colors/RandomColor.php'); // server
+// generate random color for basic bar graph only
+// for local use
+include(app_path() . '\Colors\RandomColor.php');
+
+// generate random color for basic bar graph only
+// for local use
+// include(app_path() . '/Colors/RandomColor.php'); 
 use \Colors\RandomColor;
 
+/**
+ * Manages BRIS data
+ */
 class BrisController extends Controller
 {
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -64,6 +77,11 @@ class BrisController extends Controller
                                            'nibra', 'nsub', 'strat', 'sdg', 'pdp', 'hnrda'));
     }
 
+    /**
+     * Generate basic bar graph for Projects
+     *
+     * @return void
+     */
     public function basic_per_proj(){
         
         $labels = array();
@@ -94,6 +112,11 @@ class BrisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basci bar graph for NIBRA
+     *
+     * @return void
+     */
     public function basic_per_nibr(){
         
         $labels = array();
@@ -124,6 +147,11 @@ class BrisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph for DOST 11-Point Agenda
+     *
+     * @return void
+     */
     public function basic_per_prior(){
         
         $labels = array();
@@ -154,6 +182,11 @@ class BrisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph for Programs
+     *
+     * @return void
+     */
     public function basic_per_prog(){
         
         $labels = array();
@@ -184,58 +217,129 @@ class BrisController extends Controller
         return $result;
     }
 
+    /**
+     * Get research types
+     *
+     * @return void
+     */
     public function research_type(){
         return Research::get_pc();
     }
 
+    /**
+     * Get project status
+     *
+     * @return void
+     */
     public function project_status(){
         return Research::get_ps();
     }
 
+    /**
+     * Get HNRDA
+     *
+     * @return void
+     */
     public function hnrda(){
         return Research::get_hnrda();
     }
 
+    /**
+     * Get PREXC
+     *
+     * @return void
+     */
     public function prexc(){
         return Research::get_prexc();
     }
 
+    /**
+     * Get Priority areas
+     *
+     * @return void
+     */
     public function pag(){
         return Research::get_pag();
     }
 
+    /**
+     * Get DOST agendas
+     *
+     * @return void
+     */
     public function dost(){
         return Research::get_dost();
     }
 
+    /**
+     * Get Strategic plan outcome
+     *
+     * @return void
+     */
     public function strat(){
         return Research::get_strat();
     }
 
+    /**
+     * Get PDP
+     *
+     * @return void
+     */
     public function pdp(){
         return Research::get_pdp();
     }
 
+    /**
+     * Get Nibra
+     *
+     * @return void
+     */
     public function nibra(){
         return Research::get_nibra();
     }
 
+    /**
+     * Get NIBRA sub items
+     *
+     * @return void
+     */
     public function nsub(){
         return Research::get_nsub();
     }
 
+    /**
+     * Get NSEA
+     *
+     * @return void
+     */
     public function nsea(){
         return Research::get_nsea();
     }
 
+    /**
+     * Get Science and Technology
+     *
+     * @return void
+     */
     public function snt(){
         return Research::get_snt(); 
     }
 
+    /**
+     * Get SDG
+     *
+     * @return void
+     */
     public function sdg(){
         return Research::get_sdg();
     }
 
+    /**
+     * Get project status
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_project_status(Request $req){
         
         $logs = array('log_user_id' => Auth::id(), 
@@ -250,6 +354,12 @@ class BrisController extends Controller
         return Research::get_project_status($req->status);
     }
 
+    /**
+     * Get NIBRA by id
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_nibra_by_id(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -264,6 +374,12 @@ class BrisController extends Controller
         return Research::get_nibra_by_id($req->id);
     }
 
+    /**
+     * Get Dost agenda by id
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_dost_agenda_by_id(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -278,6 +394,12 @@ class BrisController extends Controller
         return Research::get_dost_agenda_by_id($req->id);
     }
 
+    /**
+     * Get program status
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_program_status(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -292,6 +414,11 @@ class BrisController extends Controller
         return Research::get_program_status($req->status);
     }
 
+    /**
+     * Get corrdinators
+     *
+     * @return void
+     */
     public function get_coordinator(){
         return Research::get_coorindator();
     }

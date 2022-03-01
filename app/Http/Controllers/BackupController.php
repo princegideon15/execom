@@ -7,13 +7,20 @@ use Illuminate\Support\Facades\DB;
 use Auth;
 use App\Logs;
 
-
-
+/**
+ * Manages backups and import
+ * 
+ */
 class BackupController extends Controller
 {
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -34,6 +41,12 @@ class BackupController extends Controller
             return $ipaddress;
     }
 
+    /**
+     * Quick export of database
+     *
+     * @param Request $request
+     * @return void
+     */
     public function export(Request $request){
         // Database configuration
         $host = 'localhost';
@@ -51,14 +64,7 @@ class BackupController extends Controller
 
         // custom data only
         if($method == 2){
-
-
-            // echo json_encode($request->input('table_structure', TRUE));
-            // to be continue july
-
-
             $tables = $request->input('table_data', TRUE);
-
         }else{
             // Get All Table Names From the Database
             $sql = "SHOW TABLES";
@@ -68,9 +74,7 @@ class BackupController extends Controller
                 $tables[] = $row[0];
             }
         }
-
         
-
         $sqlScript = "";
         foreach ($tables as $table) {
             
@@ -145,10 +149,15 @@ class BackupController extends Controller
         }
     }
 
+    /**
+     * Import sql file (INSERT IGNORE)
+     *
+     * @param Request $request
+     * @return void
+     */
     public function import(Request $request){
 
         // Name of the data file
-        // $filename = $_FILES['import_file']['name'];
         $filename = $request->file('file');
         $file_name = $request->file('file')->getClientOriginalName();
 

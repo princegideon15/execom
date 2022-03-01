@@ -11,6 +11,9 @@ include(app_path() . '\Colors\RandomColor.php'); // local
 // include(app_path() . '/Colors/RandomColor.php'); // server
 use \Colors\RandomColor;
 
+/**
+ * Manages SKMS members data
+ */
 class MemisController extends Controller
 {
     public function __construct()
@@ -20,6 +23,11 @@ class MemisController extends Controller
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -40,6 +48,11 @@ class MemisController extends Controller
             return $ipaddress;
     }
 
+    /**
+     * Generate basic bar graph per divisions from dashboard
+     *
+     * @return void
+     */
     public function basic_per_div(){
         $labels = array();
         $values = array();
@@ -70,6 +83,11 @@ class MemisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph per regions from dashboard
+     *
+     * @return void
+     */
     public function basic_per_reg(){
         $labels = array();
         $values = array();
@@ -102,6 +120,11 @@ class MemisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph per member category (regular, associate, honorary, special provision)
+     *
+     * @return void
+     */
     public function basic_per_cat(){
         $labels = array();
         $values = array();
@@ -133,6 +156,11 @@ class MemisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph per status (active, inactive, deceased)
+     *
+     * @return void
+     */
     public function basic_per_stat(){
         $labels = array();
         $values = array();
@@ -164,6 +192,11 @@ class MemisController extends Controller
         return $result;
     }
 
+    /**
+     * Generate basic bar graph per sex
+     *
+     * @return void
+     */
     public function basic_per_sex(){
         $labels = array();
         $values = array();
@@ -223,12 +256,23 @@ class MemisController extends Controller
         return view('charts.memis', compact('id','division_list', 'region_list', 'category_list', 'status_list', 'sex_list', 'country_list'));
     }
 
+    /**
+     * Get division names
+     *
+     * @return void
+     */
     public function get_all_division(){
 
        return Member::get_divisions_list();
 
     }
 
+    /**
+     * Get members per division
+     *
+     * @param Request $req
+     * @return void
+     */
     public function per_division(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -243,6 +287,12 @@ class MemisController extends Controller
         return Member::per_division($req->id);
     }
 
+    /**
+     * Get members per region
+     *
+     * @param Request $req
+     * @return void
+     */
     public function per_region(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -257,6 +307,12 @@ class MemisController extends Controller
         return Member::per_region($req->id);
     }
 
+    /**
+     * Get members per category
+     *
+     * @param Request $req
+     * @return void
+     */
     public function per_category(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -271,6 +327,12 @@ class MemisController extends Controller
         return Member::per_category($req->id);
     }
 
+    /**
+     * Get members per status
+     *
+     * @param Request $req
+     * @return void
+     */
     public function per_status(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -285,6 +347,12 @@ class MemisController extends Controller
         return Member::per_status($req->id);
     }
 
+    /**
+     * Get members per sex
+     *
+     * @param Request $req
+     * @return void
+     */
     public function per_sex(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -299,6 +367,12 @@ class MemisController extends Controller
         return Member::per_sex($req->id);
     }
 
+    /**
+     * Get all members
+     *
+     * @param Request $req
+     * @return void
+     */
     public function all_members(Request $req){
         
         $logs = array('log_user_id' => Auth::id(), 
@@ -313,6 +387,12 @@ class MemisController extends Controller
         return Member::get_all_members();
     }
 
+    /**
+     * Get member awards
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_awards(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -328,6 +408,12 @@ class MemisController extends Controller
         return Member::get_awards();
     }
 
+    /**
+     * Get governing boards
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_gb(Request $req){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -343,10 +429,21 @@ class MemisController extends Controller
         return Member::get_gb($req->id);
     }
 
+    /**
+     * Get ExeCom IS users
+     *
+     * @return void
+     */
     public function get_users(){
         return Member::get_users();
     }
 
+    /**
+     * Get all province
+     *
+     * @param Request $req
+     * @return void
+     */
     public function get_province(Request $req){
           
         $labels = array();
@@ -354,9 +451,14 @@ class MemisController extends Controller
 
         $province = Member::get_province($req->id);
 
-        return $province;//continue on monday
+        return $province;
     }
 
+    /**
+     * Get discrepancies (no region, abroad, no status)
+     *
+     * @return void
+     */
     public function get_discrepancies(){
         $members = Member::count_members();
         $abroad = Member::get_abroad();
@@ -371,6 +473,12 @@ class MemisController extends Controller
         return $disc;
     }
 
+    /**
+     * Get members from clicked bar in bar graph
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_bar_graph_by_id(Request $req){
 
         $filters = array();
@@ -383,6 +491,12 @@ class MemisController extends Controller
         return Member::do_bar_graph_by_id($req, $all, $req->id);
     }
     
+    /**
+     * Generate basic bar graph
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_bar_graph(Request $req){
 
         $filters = array();
@@ -395,7 +509,12 @@ class MemisController extends Controller
         return Member::do_bar_graph($req, $all);
     }
     
-    
+    /**
+     * Generate stacked column graph
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_stack_column_graph(Request $req){
 
         $filters = array();
@@ -410,6 +529,12 @@ class MemisController extends Controller
         
     }
     
+    /**
+     * Generated stacked graph
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_stack_graph(Request $req){
 
         $filters = array();
@@ -421,6 +546,12 @@ class MemisController extends Controller
         
     }
     
+    /**
+     * Generate column graph
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_column_graph(Request $req){
 
         $filters = array();
@@ -433,10 +564,21 @@ class MemisController extends Controller
         
     }
 
+    /**
+     * Generate advance stacked-column graph (all sex, all division across regions)
+     *
+     * @return void
+     */
     public function do_advance_stack_column_graph(){
         return Member::do_advance_stack_column_graph();
     }
 
+    /**
+     * Generate line graph (per sex, member category across divisions/regions)
+     *
+     * @param Request $req
+     * @return void
+     */
     public function do_line_graph(Request $req){
 
         $filters = array();
@@ -448,6 +590,12 @@ class MemisController extends Controller
         return Member::do_line_graph($req);
     }
 
+    /**
+     * Generate bar graph with drilldown (for all regions only)
+     *
+     * @param Request $req
+     * @return void
+     */
     public function drilldown_region(Request $req){
         $filters = array();
         foreach($req->all() as $key => $value) {
@@ -461,6 +609,11 @@ class MemisController extends Controller
         // return $req->par1;
     }
 
+    /**
+     * Get Customer service feedback
+     *
+     * @return void
+     */
     public function get_csf(){
 
         $csf = Member::get_csf();
@@ -476,10 +629,20 @@ class MemisController extends Controller
         return $csf;
     }
 
+    /**
+     * Get questions from SKMS database
+     *
+     * @return void
+     */
     public function get_questions(){
         return Member::get_questions();
     }
 
+    /**
+     * Get CSF from SKMS database
+     *
+     * @return void
+     */
     public function get_csf_list(){
         return Member::get_csf_list();
     }

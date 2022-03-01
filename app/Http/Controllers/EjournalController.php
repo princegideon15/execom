@@ -8,10 +8,18 @@ use App\Ejournal;
 use App\Logs;
 use Auth;
 
+/**
+ * Manages eJournal data
+ */
 class EjournalController extends Controller
 {
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -82,7 +90,7 @@ class EjournalController extends Controller
     }
 
     /**
-     * get all data
+     * Get published articles
      */
     public function published_articles(){
         
@@ -98,6 +106,11 @@ class EjournalController extends Controller
         return Ejournal::get_published_articles();
     }
 
+    /**
+     * Get cited articles
+     *
+     * @return void
+     */
     public function cited_articles(){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -112,6 +125,11 @@ class EjournalController extends Controller
         return Ejournal::get_cited_articles();
     }
 
+    /**
+     * Get viewed articles by their abstract by client
+     *
+     * @return void
+     */
     public function viewed_articles(){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -126,6 +144,11 @@ class EjournalController extends Controller
         return Ejournal::get_viewed_articles();
     }
 
+    /**
+     * Get artciles with download full text pdf by client
+     *
+     * @return void
+     */
     public function downloaded_articles(){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -140,6 +163,11 @@ class EjournalController extends Controller
         return Ejournal::get_downloaded_articles();
     }
 
+    /**
+     * Get searched keywords saved in a text file
+     *
+     * @return void
+     */
     public function searched_topics(){
 
         // $file = '../ejournal/assets/keywords.txt';
@@ -211,6 +239,11 @@ class EjournalController extends Controller
         // return $sorted_topics;
     }
 
+    /**
+     * Get clients info who dowbloaded article full text pdf
+     *
+     * @return void
+     */
     public function most_clients(){
 
         $logs = array('log_user_id' => Auth::id(), 
@@ -225,6 +258,11 @@ class EjournalController extends Controller
         return Ejournal::get_most_clients();
     }
 
+    /**
+     * Get client's location when they visited the website
+     *
+     * @return void
+     */
     public function visitors_origin(){
 
         $logs = array('log_user_id' => Auth::id(), 
