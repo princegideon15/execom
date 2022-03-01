@@ -36,6 +36,11 @@ class ResetPasswordController extends Controller
 
     private $ipaddress;
 
+    /**
+     * Get IP address of user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -61,8 +66,14 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
+
     // protected $redirectTo = RouteServiceProvider::HOME;
 
+    /**
+     * Validation messages
+     *
+     * @return void
+     */
     public function messages(){
         return [
             'email.required' => 'Email is required.',
@@ -78,7 +89,7 @@ class ResetPasswordController extends Controller
         ];
     }
     
-       /**
+    /**
      * Get the error messages for the defined validation rules.
      *
      * @return array
@@ -90,6 +101,12 @@ class ResetPasswordController extends Controller
         ];
     }
 
+    /**
+     * Verify user for password reset
+     *
+     * @param Request $req
+     * @return void
+     */
     public function verify(Request $req){
         
     
@@ -109,7 +126,7 @@ class ResetPasswordController extends Controller
     
             session()->regenerate();
             $otp = random_int(100000, 999999);
-            $data = array('name' => 'Gerard Balde', 'otp' => $otp);
+            $data = array('name' => 'User', 'otp' => $otp);
             $otp_timestamp = Carbon::now()->timestamp;
             session(['session_timestamp' => $otp_timestamp]);
             session(['session_otp' => $otp]);
@@ -123,16 +140,20 @@ class ResetPasswordController extends Controller
                 $message->from('nrcp.execom@gmail.com','ExeCom IS Admin');
             });
 
-            // return view('auth.passwords.otp', compact('recipient'));
             $crypt_rec = Crypt::encrypt($recipient);
-
             
-            return redirect()->route('reset-otp', ['email' => $crypt_rec]); //todo
+            return redirect()->route('reset-otp', ['email' => $crypt_rec]);
             
         }
         
     }
     
+    /**
+     * Check if logged in already or OTP was generated
+     *
+     * @param [type] $email
+     * @return void
+     */
     public function otp($email){
         if(session('logged_in') == 1){
             return redirect()->route('home');
@@ -146,6 +167,12 @@ class ResetPasswordController extends Controller
         }
     }
 
+    /**
+     * Verify OTP
+     *
+     * @param Request $req
+     * @return void
+     */
     public function verify_otp(Request $req){
         
         $session_new_p =  session('session_new_p'); 
@@ -213,8 +240,15 @@ class ResetPasswordController extends Controller
         }
     }
 
-    public function mail($email, $name, $id)
-    {
+    /**
+     * Send email to user a Password reset and account activation
+     *
+     * @param [type] $email
+     * @param [type] $name
+     * @param [type] $id
+     * @return void
+     */
+    public function mail($email, $name, $id){
         $data = array('name' => $name, 'email' => $email, 'id' => $id);
 
         Mail::send(['html'=>'email.message'], $data, function($message) use ($email, $name, $id) {
@@ -235,6 +269,12 @@ class ResetPasswordController extends Controller
         Logs::create($logs);
     }
 
+    /**
+     * Activate acount
+     *
+     * @param [type] $id
+     * @return void
+     */
     public function activate($id){
 
         $status = Execom::where('user_id', $id)->value('status'); 
@@ -259,6 +299,12 @@ class ResetPasswordController extends Controller
         
     }
 
+    /**
+     * Resent OTP
+     *
+     * @param Request $req
+     * @return void
+     */
     public function resend(Request $req){
 
         $email = $req->email;
