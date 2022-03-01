@@ -53,6 +53,7 @@ Route::any('/resend-reset-otp/', 'Auth\ResetPasswordController@resend');
 
 Auth::routes();
 
+// dashboard
 Route::get('/home', 'HomeController@index')->name('home');
 
 // memis basic bar graph
@@ -168,6 +169,7 @@ Route::post('/search/city', 'SearchController@get_city');
 Route::get('/search/divs',  'SearchController@get_divisions');
 // Route::post('/search/brgy', 'SearchController@get_brgy');
 
+// users
 Route::get('/skms_users', 'MemisController@get_users');
 Route::get('/execom_users', 'HomeController@get_users');
 Route::post('/execom/add', 'HomeController@add_user');
@@ -175,13 +177,14 @@ Route::post('/execom/remove', 'HomeController@remove_user');
 Route::post('/execom/create', 'HomeController@create_user');
 Route::get('/execom/logs', 'HomeController@activity_logs');
 
+// ui/ux feedbacks of ExeCom IS
 Route::post('/submit_feedback', 'FeedbackController@store');
 Route::get('/verify_feedback', 'FeedbackController@verify');
 Route::get('/feedbacks_chart', 'FeedbackController@show');
 Route::get('/feedbacks', 'FeedbackController@all');
 Route::post('/update_feedbacks', 'FeedbackController@update');
 
-
+// backup and import
 Route::post('/backup/export', 'BackupController@export');
 Route::post('/backup/import', 'BackupController@import');
 
