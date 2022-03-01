@@ -64,6 +64,11 @@ class LoginController extends Controller
 
     private $ipaddress;
 
+    /**
+     * Get IP address of the user
+     *
+     * @return void
+     */
     public function get_ip(){
         
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -89,8 +94,7 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct(){
         $this->middleware('guest')->except('logout');
     }
 
@@ -109,8 +113,16 @@ class LoginController extends Controller
         ];
     }
 
-    public function doLogin(Request $req)
-    {
+    /**
+     * Validate login authentication
+     * 
+     * If username and password is correct, proceeds to OTP page
+     *
+     * @param Request $req
+     * @return void
+     */
+    public function doLogin(Request $req){
+        // get info of user by email
         $recipient = $req->email;
         $userdata = array(
             'email' => $req->email,
@@ -163,6 +175,7 @@ class LoginController extends Controller
             $name =  Auth::user()->name;
             $crypt_rec = Crypt::encrypt($recipient);
 
+            // generate OTP
             session()->regenerate();
             $otp = random_int(100000, 999999);
             $data = array('name' => $name, 'otp' => $otp);
@@ -170,7 +183,7 @@ class LoginController extends Controller
             session(['session_timestamp' => $otp_timestamp]);
             session(['session_otp' => $otp]);
 
-   
+            // send OTP in the user's email
             Mail::send('auth.otpmail',$data, function($message) use ($recipient, $name) {
                 $message->to($recipient, $name)->subject
                     ('ExeCom IS One-Time PIN (OTP)');
@@ -230,6 +243,12 @@ class LoginController extends Controller
 
     }
 
+    /**
+     * Check if logged in already or OTP was generated
+     *
+     * @param [type] $email
+     * @return void
+     */
     public function otp($email){
             if(session('logged_in') == 1){
                 return redirect()->route('home');
@@ -255,6 +274,12 @@ class LoginController extends Controller
         ];
     }
 
+    /**
+     * Verify entered OTP in OTP page
+     *
+     * @param Request $req
+     * @return void
+     */
     public function verify_otp(Request $req){
 
         $validator = Validator::make($req->all(), [
@@ -267,21 +292,15 @@ class LoginController extends Controller
         $session_timestamp = session('session_timestamp'); 
         $current_timestamp = Carbon::now()->timestamp;
 
-        // return $session_timestamp . ' - ' . $current_timestamp;exit;
-
+    
         if ($validator->fails()) {
-            // return 'required field';
             return redirect()->back()->withErrors($validator)->withInput();
         }else{
-
             if(($current_timestamp - $session_timestamp) > 300)  // 300 refers to 300 seconds
             {
-                $message = new MessageBag(['error' => ['OTP expired. Please try again.']]); //todo 
+                $message = new MessageBag(['error' => ['OTP expired. Please try again.']]); 
                 
-                // return $session_timestamp - $current_timestamp . ' -  opt expired';
             return redirect()->back()->withErrors($message);
-            // return 'expired';
-
             }
             else{
                 if ($otp == $session_otp) 
@@ -289,11 +308,8 @@ class LoginController extends Controller
                     session()->forget(['session_otp', 'session_timestamp']);
                     session(['logged_in' => 1]);
 
-                    
-                    // $recipient = Auth::user()->email;
+                    // get user info for logs
                     $recipient = 'nrcp.execom@gmail.com';
-
-
                     $logs = array('log_user_id' => Auth::id(), 
                     'log_email' => $recipient, 
                     'log_ip_address' => $this->get_ip(),
@@ -302,8 +318,10 @@ class LoginController extends Controller
                     'log_description' => 'Login', 
                     'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
 
+                    // save log
                     Logs::create($logs);
 
+                    // get browser info and other user info
                     $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
                     $browser = Browser::browserName();
                     $name = Auth::user()->name;
@@ -311,6 +329,7 @@ class LoginController extends Controller
                     $ip = $this->get_ip();
                     $data = array('title' => 'Login Success', 'name' => $name, 'recipient' => $recipient, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip);
 
+                    // send info to gmail of execom
                     Mail::send('auth.loginmail', $data, function($message) use ($recipient, $name) {
                         $message->to($recipient, $name)
                         ->cc(['gerard_balde@yahoo.com','gerardbalde15@gmail.com'])->subject
@@ -322,7 +341,6 @@ class LoginController extends Controller
                 } 
                 else {
                     $message = new MessageBag(['error' => ['OTP incorrect']]);
-                    
                     return redirect()->back()->withErrors($message);
                 }
             }
@@ -330,6 +348,12 @@ class LoginController extends Controller
         }
     }
 
+    /**
+     * Resend OTP if expired
+     *
+     * @param Request $req
+     * @return void
+     */
     public function resend(Request $req){
 
             $email = $req->email;
@@ -355,11 +379,13 @@ class LoginController extends Controller
             $crypt_rec = Crypt::encrypt($email);
             return redirect()->route('otp', ['email' => $crypt_rec]);
     }
-
     
-
-    public function logout()
-    {
+    /**
+     * Logouts user, flush sessions
+     *
+     * @return void
+     */
+    public function logout(){
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' =>  Auth::user()->email,
                       'log_ip_address' => $this->get_ip(), 
