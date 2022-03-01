@@ -6956,12 +6956,14 @@ function view_feedbacks(){
         async: false,
         success: function (response) {
         $.each(response, function(key, val){
+            var fb_ui = (val.fb_suggest_ui != null) ? val.fb_suggest_ui : '-';
+            var fb_ux = (val.fb_suggest_ux != null) ? val.fb_suggest_ux : '-';
             $('#feedback_table').append('<tr><td></td> \
                                              <td>' + val.name + '</td> \
                                              <td>' + val.UI + '</td> \
-                                             <td>' + val.fb_suggest_ui + '</td> \
+                                             <td>' + fb_ui + '</td> \
                                              <td>' + val.UX + '</td> \
-                                             <td>' + val.fb_suggest_ux + '</td> \
+                                             <td>' + fb_ux + '</td> \
                                              <td>' + moment(val.created_at).format("MMM DD, YYYY") + '</td> \
                                         </tr>');
         });
@@ -7788,12 +7790,14 @@ function memis_generate_chart(chart){
                     for (quarter; quarter <  4; quarter++) {
                         stacked_bar_y.push(quarters[quarter]);
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + '(Quarterly' + p_year + ')';
                 }else if(period == 3){
                     stacked_bar_y = [];
                     for (semestral; semestral <  2; semestral++) {
                         stacked_bar_y.push(sems[semestral]);
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + '(Semestral' + p_year + ')';
                 }
     
@@ -7964,12 +7968,14 @@ function memis_generate_chart(chart){
                     for (quarter; quarter <  4; quarter++) {
                         stacked_bar_y.push(quarters[quarter]);
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + '(Quarterly ' + p_year + ')';
                 }else if(period == 3){
                     stacked_bar_y = [];
                     for (semestral; semestral <  2; semestral++) {
                         stacked_bar_y.push(sems[semestral]);
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + '(Semestral ' + p_year + ')';
                 }
     
@@ -8399,6 +8405,7 @@ function memis_generate_chart(chart){
                 // $('#chart_orientation').prop('checked', true); // Unchecks it
                 // $('#chart_orientation').change(); // Unchecks it
                 chart_rendered = 1;
+                
 
                 var memis_labels = [];
                 var memis_total = [];
@@ -8444,6 +8451,7 @@ function memis_generate_chart(chart){
                         stacked_bar_y.push(quarters[quarter]);
                         key[quarters[quarter]] = quarter;
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + ', Rate of Increase ' + '(Quarterly ' + p_year + ')';
                 }else if(period == 3){
                     stacked_bar_y = [];
@@ -8451,6 +8459,7 @@ function memis_generate_chart(chart){
                         stacked_bar_y.push(sems[semestral]);
                         key[sems[semestral]] = semestral;
                     }
+                    var p_year = (period_year > 0) ? period_year : '';
                     bar_main_title = category_title + ', Rate of Increase ' + '(Semestral ' + p_year + ')';
                 }
                 $.ajax({
