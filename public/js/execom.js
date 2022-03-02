@@ -46,6 +46,7 @@ $(document).ready(function(){
         return false;
       });
 
+    // advance search button
     $('#search_button').click(function(){ 
         $('#search_result').empty();
         var sys = $('#search_filter').val();
@@ -69,9 +70,6 @@ $(document).ready(function(){
                 search_arr['sys'] = sys;
                 searches.push($('#search_filter option[value="'+sys+'"]').text());
             }else if(keyword != '' && sys == 0){
-                // $('#search_result').append('<div class="alert alert-danger mt-3"> \
-                // <span class="fa fa-exclamation-circle"></span> Find All. \
-                // </div>');
                 show_overall(keyword);
                 return false;
             }
@@ -643,30 +641,33 @@ $(document).ready(function(){
             });
     });
 
+    // clear filter and keyword
     $('#clear_filter').click(function(){
         $('#search_filter').val(0).change();
         $('#search_keyword').val('');
         $('#search_result').empty();
     });
 
+    // validate filter selection, dynamic sub options after selecting filter
     $('#search_filter').change(function()
     {
         var filter = $(this).val();
         var select = 'Sub-Options<select class="form-control" id="sub_filter'+filter+'"><option value="0">Select here</option>';
 
-        if(filter == 1){
+        
+        if(filter == 1){ // MemIS
             select += '<option value="1">Specialization</option>'
             select += '<option value="2">LN, FN</option>';
             select += '<option value="3">All Members</option>';
             select += '<option value="4">NRCP Achievement Awardee</option>';
             select += '<option value="5">Governing Board</option>';
-        }else if(filter == 2){
+        }else if(filter == 2){ // BRIS
             select += '<option value="1">Projects</option>'
             select += '<option value="2">Programs</option>';
-        }else if(filter == 3){
+        }else if(filter == 3){ // eJournal
             select += '<option value="1">Title</option>'
             select += '<option value="2">Author</option>';
-        }else if(filter == 4){
+        }else if(filter == 4){ // LMS
             select += '<option value="9">Annual Report</option>'
             select += '<option value="7">Board Resolution</option>';
             select += '<option value="4">Book</option>';
@@ -679,7 +680,7 @@ $(document).ready(function(){
             select += '<option value="8">S&T Clippings</option>';
             select += '<option value="1">Terminal Report</option>';
             select += '<option value="2">Thesis</option>';
-        }else if(filter == 5){
+        }else if(filter == 5){ // NRCPnet
             select += '<option value="1">Employee Name</option>'
             select += '<option value="2">Division</option>';
         }else{
@@ -797,6 +798,7 @@ $(document).ready(function(){
 
     });
 
+    // populate province dropdown
     $(document).on('change', "#reg_filter", function(e){
         var val = $(this).val();
 
@@ -825,6 +827,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // populate city dropdown
     $(document).on('change', "#prov_filter", function(){
         var val = $(this).val();
 
@@ -849,9 +852,10 @@ $(document).ready(function(){
         });
     });
     
-
+    // enable plugin to fomart dates in jquery
     moment().format();
 
+    // BRIS graph generation (not available, subject to re-implementation)
     if($('#bris_bar_chart').length){
 
         var bris_bar_chart , bris_pie_chart;   
@@ -937,8 +941,7 @@ $(document).ready(function(){
         });
     }
 
-    // /.initialize BRIS
-
+    // BRIS filter for graph generation (not available, subject to re-implementation)
     $('#bris_filter').on('change', function(){
         var filter = $(this).val();
         var _url;
@@ -961,12 +964,7 @@ $(document).ready(function(){
         else if(filter == 11){ _url = '/bris/nsea'; bris_title = 'National Socio-Economic Agenda'; }
         else if(filter == 12){ _url = '/bris/snt'; bris_title = 'Classification by S&T Activity'; }
         else{ _url = '/bris/sdg'; bris_title = 'Sustainable Development Goals'; }
-        // alert(_url + ' ' + bris_title);
-        // $.ajaxSetup({
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     }
-        // });
+
 
         $.ajax({
             method: 'GET',
@@ -1045,6 +1043,7 @@ $(document).ready(function(){
 
     });
     
+    // LMS graph generation (not available, subject to re-implementation)
     if($('#lms_bar_chart').length){
     
         var lms_bar_chart , lms_pie_chart;   
@@ -1127,8 +1126,8 @@ $(document).ready(function(){
             }
         });
     }
-    // /.initialize LMS
-  
+    
+    // LMS filter for graph generation (not available, subject to re-implementation)
     $('#lms_filter_by').on('change', function()
     {
         lms_labels = [];
@@ -1250,6 +1249,7 @@ $(document).ready(function(){
         });  
     });
 
+    // eJournal graph generation (not available, subject to re-implementation)
     if($('#ej_bar_chart').length){
         var ej_bar_chart , ej_pie_chart;   
         //initialize EJOURNAL
@@ -1346,8 +1346,8 @@ $(document).ready(function(){
             }
         }); 
     } 
-    // /.initialize EJOURNAL
 
+    // eJournal by year filter for graph generation (not available, subject to re-implementation)
     $('#ej_filter_by_year').on('change', function(){
         $.ajaxSetup({
             headers: {
@@ -1440,6 +1440,7 @@ $(document).ready(function(){
 
     });
 
+    // eJournal by cateogry filter for graph generation (not available, subject to re-implementation)
     $('#ej_filter_by').on('change', function()
     {
 
@@ -1645,16 +1646,19 @@ $(document).ready(function(){
         }); 
     });
 
+    // removed
     $("#skms_table").on('click', '.btn-success', function () {
         $(this).closest('tr').remove();
         execom_users();
     });
 
+    // display execom user after remove/delete
     $("#execom_table").on('click', '.btn-danger', function () {
         $(this).closest('tr').remove();
          all_users();
     });
     
+    // add execom user
     $("#create_new_form").validate({
         debug: true,
         errorClass: 'text-danger',
@@ -1721,32 +1725,7 @@ $(document).ready(function(){
         }
     });
 
-    $('#create_new_formx').on('submit', function(e){
-        e.preventDefault();
-
-        // console.log($(this).serializeArray());
-
-        var formdata = $(this).serialize();
-
-        $.ajax({
-            type: "POST",
-            url: APP_URL + '/execom/create',
-            data:  formdata,
-            cache: false,
-            crossDomain: true,
-            success: function(response) {
-                if(response == '1'){
-                    $('#create_new_form .error').text('Email already exists');
-                }else{
-                    $('#create_new_form')[0].reset();
-                    execom_users();
-                    $('#users-tab').click();
-
-                }
-            }
-        });
-    });
-
+    // validataion for smiley in UI internal user feedback form
     $('#generate_chart_form input:radio[name="fb_rate_ui"]').change(
     function(){
         if (this.checked) {
@@ -1754,6 +1733,7 @@ $(document).ready(function(){
         }
     });
 
+    // validataion for smiley in UX internal user feedback form
     $('#generate_chart_form input:radio[name="fb_rate_ux"]').change(
     function(){
         if (this.checked) {
@@ -1761,6 +1741,7 @@ $(document).ready(function(){
         }
     });
       
+    // submit internal user feedback form
     $('#feedback_form').on('submit', function(e){
 
         e.preventDefault();
@@ -1807,7 +1788,7 @@ $(document).ready(function(){
         }
     });
 
-    
+    // show password in login
     $("#show_password").on('click',function() {
         var pass = $('.password');
         var icon = $('.icon');
@@ -1822,6 +1803,7 @@ $(document).ready(function(){
         }
     });
 
+    // show password in add user
     $("#show_password_add_user").on('click',function() {
         
         var pass = $('#password');
@@ -1837,6 +1819,7 @@ $(document).ready(function(){
         }
     });
 
+    // show password new password in reset
     $("#show_new_password").on('click',function() {
         var pass = $('.new_password');
         var icon = $('.icon');
@@ -1851,6 +1834,7 @@ $(document).ready(function(){
         }
     });
 
+    // show repeat password
     $("#show_rep_password").on('click',function() {
         var pass = $('.rep_password');
         var icon = $('.rep_icon');
@@ -1865,6 +1849,7 @@ $(document).ready(function(){
         }
     });
 
+    // validation in quick search
     $('#quick_search').on('keydown', function(e){
         if(e.which == 13 && $(this).val() != '') {
             show_overall($(this).val());
@@ -1872,891 +1857,19 @@ $(document).ready(function(){
         }
     });
 
+    // validation in filters for specific period/time/duration (MemIS graph generator)
     $('#time_tab .nav-link').click(function(){
         $('#time_content select').val('0');
         $('#time_content select').removeClass('bg bg-dark text-white font-weight-bold');
         $('#column_bar_tab, #stacked_column_tab').removeClass('text-success').addClass('disabled');
     });
 
-    // $('#search_keyword').on('keydown', function(e){
-    //     if(e.which == 13 && $(this).val() != '') {
-    //         show_overall($(this).val());
-    //         $('#quick_search_keyword').text($(this).val());
-    //     }
-    // });
-
-    // memis graph
-
-    // $('#btn_generate_chart').click(function(e){
-    //     var default_x = $('input[type=radio]:checked').attr('id');
-
-    
-
-    //     $('.no-data-found').remove();
-    //     bar_sub_title = [];
-    //     $("#generate_chart_form option:selected").each(function() {
-    //         if($(this).val() > 0){
-    //             bar_sub_title.push($(this).text());
-    //         }
-    //     });
-
-        
-    //     var selections = [];
-    //     var filter_counter = 0;
-        
-    //     $("#generate_chart_form select:not(#memis_start_year,#memis_end_year) option:selected").each(function() {
-    //         selections.push($(this).val());
-    //     });
-    //     for (let i = 0; i < selections.length; i++) {
-    //         if (selections[i] != '0') filter_counter++;
-    //     }
-
-    //     if(filter_counter == 0){
-    //         $('.chart_filter_alert').fadeOut('slow');
-    //         $('#generate_chart_form').prepend('<div class="alert alert-danger chart_filter_alert" role="alert"> \
-    //         <span class="fas fa-exclamation-triangle"></span> Select atleast one (1) filter \
-    //         </div>').hide().fadeIn('slow');
-    //     }else{
-
-    //         if ($('input[name="radio_generate_chart"]:checked').length == 0) {
-    //             $('.chart_radio_alert').fadeOut('slow');
-    //             $('.notice_radio_chart').append('<div class="alert alert-danger chart_radio_alert" role="alert"> \
-    //             <span class="fas fa-exclamation-triangle"></span> Select atleast one (1) chart \
-    //             </div>').hide().fadeIn('slow');
-    //         }
-    //     }
-
-    //     var chart = $('input[name="radio_generate_chart"]:checked').val();
-    //     var total = 0;
-
-    //     if(chart == 1){ // bar chart
-            
-            
-    //         chart_numbers = 1;
-    //         $('#chart_numbers').prop('checked', true); // Unchecks it
-    //         $('#chart_numbers').change(); // Unchecks it
-    //         chart_orientation = 1;
-    //         $('#chart_orientation').prop('checked', true); // Unchecks it
-    //         $('#chart_orientation').change(); // Unchecks it
-    //         chart_rendered = 1;
-
-    //         var memis_labels = [];
-    //         var memis_total = [];
-    //         var memis_bgcolors = [];
-    //         var memis_ids = [];
-    //         var memis_drill_data = [];
-    //         var memis_series_drill = [];
-    //         $.ajax({
-    //             method: 'POST',
-    //             url: APP_URL + '/memis/bar_graph',
-    //             async: false,
-    //             data:  $('#generate_chart_form').serialize(),
-    //             datatype: 'json',
-    //             success: function (response) {
-    //                 if(response.length > 0){
-    //                     $.each(response, function(key, val){   
-    //                         memis_total.push(parseInt(val.total));
-    //                         memis_labels.push(val.label);
-    //                         memis_bgcolors.push('#800000');
-    //                         memis_ids.push(val.bar_id);
-    //                         total += parseInt(val.total);
-
-                              
-    //                         memis_drill_data.push({
-    //                             name:val.label,
-    //                             y: val.total,
-    //                             drilldown: val.label
-    //                         })
-
-    //                     });
-
-                        
-    //                 }else{
-    //                     $('.no-data-found').remove();
-    //                     $('.no_data_available').after('<div class="alert alert-warning mt-4 no-data-found text-center" role="alert"> \
-    //                     <span class="fas fa-exclamation-triangle font-weight-bold"></span> NO DATA AVAILABLE. \
-    //                   </div>').hide().fadeIn();
-    //                 }
-    //             }
-    //         });
-
-    //         bar_labels = memis_labels;
-    //         bar_total = total;
-           
-    //         if(default_x == 'default_region'){
-
-    //             var y = 0;
-    //             $.each(memis_labels, function(key, val){
-    //                 y++;
-    //                 memis_series_drill.push({
-    //                     name:val,
-    //                     id: val,
-    //                     data:  JSON.parse(get_drilldown(y))
-    //                 })
-    //             });
-
-    //             exeChart = new Highcharts.chart('container', {
-    //                 chart: {
-    //                     type: 'bar',
-    //                     events: {
-    //                     load: function() {
-    //                         var chart = this,
-    //                         barsLength = chart.series[0].data.length;
-                    
-    //                         chart.update({
-    //                         chart: {
-    //                             height: 100 + (50 * barsLength)
-    //                         }
-    //                         }, true, false, false);
-    //                     }
-    //                     }
-    //                 },
-    //                 title: {
-    //                     text: bar_main_title
-    //                 },
-    //                 subtitle: {
-    //                     text: 'Source: http://execom.nrcp.dost.gov.ph/'
-    //                 },
-    //                 accessibility: {
-    //                     announceNewData: {
-    //                         enabled: true
-    //                     }
-    //                 },
-    //                 xAxis: {
-    //                     // categories: memis_labels,
-    //                     type: 'category',
-    //                     title: {
-    //                         text: null
-    //                     },
-    //                     labels: {
-    //                         style: {
-    //                             fontSize:'14px'
-    //                         }
-    //                     }
-    //                 },
-    //                 yAxis: {
-    //                     min: 0,
-    //                     title: {
-    //                         text: 'Total Members (' + total + ')',
-    //                           align: 'high'
-    //                     },
-    //                     labels: {
-    //                         overflow: 'justify'
-    //                     }
-    //                 },
-                    
-    //                 plotOptions: {
-    //                     series: {
-    //                         events: {
-    //                             click: function(event) {
-    //                                 if (chart.drillUpButton) {
-    //                                     alert("testing" + event.point.name) //todo
-    //                                } 
-    //                             }
-    //                           },
-    //                         dataLabels:{
-    //                             enabled:true,
-    //                             formatter:function() {
-    //                                 var pcnt = (this.y / total) * 100;
-    //                                 return this.y + '(' + Highcharts.numberFormat(pcnt) + '%)';
-    //                             }
-    //                         }
-    //                     },
-    //                 },
-    //                 tooltip: {
-    //                     headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-    //                     pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}<br/>'
-    //                 },
-    //                 legend: {
-    //                     layout: 'vertical',
-    //                     x: -40,
-    //                     y: 80,
-    //                     floating: true,
-    //                     shadow: true
-    //                 },
-    //                 credits: {
-    //                     enabled: false
-    //                 },
-    //                 series: [
-    //                     {
-    //                         name: "Regions",
-    //                         colorByPoint: true,
-    //                         data: memis_drill_data
-    //                     }
-    //                 ],
-    //                 drilldown: { series : memis_series_drill}
-    //             });
-                
-               
-    //         }else{
-
-    //             exeChart = new Highcharts.chart('container', {
-    //                 chart: {
-    //                     type: 'bar',
-    //                     events: {
-    //                     load: function() {
-    //                         var chart = this,
-    //                         barsLength = chart.series[0].data.length;
-                    
-    //                         chart.update({
-    //                         chart: {
-    //                             height: 100 + (50 * barsLength)
-    //                         }
-    //                         }, true, false, false);
-    //                     }
-    //                     }
-    //                 },
-    //                 title: {
-    //                     text: bar_main_title
-    //                 },
-    //                 subtitle: {
-    //                     text: 'Source: http://execom.nrcp.dost.gov.ph/'
-    //                 },
-    //                 xAxis: {
-    //                     categories: memis_labels,
-    //                     title: {
-    //                         text: null
-    //                     },
-    //                     labels: {
-    //                         style: {
-    //                             fontSize:'14px'
-    //                         }
-    //                     }
-    //                 },
-    //                 yAxis: {
-    //                     min: 0,
-    //                     title: {
-    //                         text: 'Total Members (' + total + ')',
-    //                         align: 'high'
-    //                     },
-    //                     labels: {
-    //                         overflow: 'justify'
-    //                     }
-    //                 },
-    //                 plotOptions: {
-    //                     bar: {
-    //                         dataLabels:{
-    //                             enabled:true,
-    //                             formatter:function() {
-    //                                 var pcnt = (this.y / total) * 100;
-    //                                 return this.y + '(' + Highcharts.numberFormat(pcnt) + '%)';
-    //                             }
-    //                         } 
-    //                     },
-    //                     series: {
-    //                         colorByPoint: true,
-    //                         colors: memis_bgcolors,
-    //                         pointWidth: '30',
-    //                         point: {
-    //                             events: {
-    //                                 click: function () {
-    //                                     click_overall(memis_ids[parseInt(this.index)], default_x);
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 },
-    //                 legend: {
-    //                     layout: 'vertical',
-    //                     x: -40,
-    //                     y: 80,
-    //                     floating: true,
-    //                     shadow: true
-    //                 },
-    //                 credits: {
-    //                     enabled: false
-    //                 },
-    //                 series: [{
-    //                     name: 'Members',
-    //                     data: memis_total,
-    //                 }]
-    //             });
-            
-    //         }
-
-            
-    //     }else if(chart == 2){ // pie chart
-
-    //         var memis_labels = [];
-    //         var memis_total = [];
-    //         var memis_bgcolors = [];
-    //         var total = 0;
-    //         var memis_ids = [];
-            
-    //         $.ajax({
-    //             method: 'POST',
-    //             url: APP_URL + '/memis/bar_graph',
-    //             async: false,
-    //             data:  $('#generate_chart_form').serialize(),
-    //             datatype: 'json',
-    //             success: function (response) {
-
-    //                 if(response.length > 0){
-    //                     $.each(response, function(key, val){   
-                            
-    //                         memis_labels.push({
-    //                             name: val.label, 
-    //                             y: parseFloat(val.total),
-    //                         });
-
-    //                         total += val.total;
-
-    //                         memis_bgcolors.push('#000000'.replace(/0/g, function(){return (~~(Math.random()*16)).toString(16);}));
-    //                         memis_ids.push(val.bar_id);
-        
-    //                     });
-            
-    //                 }else{
-    //                     $('.no-data-found').remove();
-    //                     $('.no_data_available').after('<div class="alert alert-warning mt-4 no-data-found text-center" role="alert"> \
-    //                     <span class="fas fa-exclamation-triangle font-weight-bold"></span> NO DATA AVAILABLE. \
-    //                   </div>').hide().fadeIn();
-    //                 }
-    //             }
-    //         });
-
-    //         Highcharts.chart('container', {
-    //             chart: {
-    //               plotBackgroundColor: null,
-    //               plotBorderWidth: null,
-    //               plotShadow: false,
-    //               type: 'pie',
-    //               marginBottom: 50 
-    //             },
-    //             title: {
-    //               text: bar_main_title
-    //             },
-    //             subtitle: {
-    //                 text: 'Source: http://execom.nrcp.dost.gov.ph/'
-    //             },
-    //             tooltip: {
-    //               pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
-    //             },
-    //             accessibility: {
-    //               point: {
-    //                 valueSuffix: '%'
-    //               }
-    //             },
-    //             plotOptions: {
-    //               pie: {
-    //                 allowPointSelect: true,
-    //                 cursor: 'pointer',
-    //                 dataLabels: {
-    //                   enabled: true,
-    //                   format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-    //                 },
-    //                 point: {
-    //                     events: {
-    //                         click: function () {
-    //                             click_overall(memis_ids[parseInt(this.index)], default_x);
-    //                         }
-    //                   }
-    //                 }
-    //               }
-    //             },    
-    //             credits: {
-    //                 text: 'Total Members (' + total + ')',
-    //                 position: {
-    //                     align: 'right',
-    //                 },
-    //                 style: {
-    //                     fontSize: '9pt', // you can style it!,
-    //                     // color: '#ffffff',
-    //                 }
-    //             },
-    //             colors: memis_bgcolors,
-    //             series: [{
-    //               name: '',
-    //               data: memis_labels
-    //             }]
-    //           });
-    //     }else if(chart == 3){ // stacked chart
-            
-    //         chart_numbers = 1;
-    //         $('#chart_numbers').prop('checked', true); // Unchecks it
-    //         $('#chart_numbers').change(); // Unchecks it
-    //         chart_orientation = 1;
-    //         $('#chart_orientation').prop('checked', true); // Unchecks it
-    //         $('#chart_orientation').change(); // Unchecks it
-    //         chart_rendered = 1;
-    //         // var default_label = $('input[name=radio_default]:checked').attr('id');
-    //         // var chart_height = (default_label == 'default_category') ? '' : '';
-
-
-    //         var memis_labels = [];
-    //         var memis_bgcolors = [];
-    //         var total = 0;
-
-    //         $.ajax({
-    //             method: 'POST',
-    //             url: APP_URL + '/memis/stack_graph',
-    //             async: false,
-    //             data:  $('#generate_chart_form').serialize(),
-    //             datatype: 'json',
-    //             success: function (response) {
-    //                 // console.log(response);
-    //                 if(response.length > 0){
-    //                     if(stacked_bar_exemption == 1){stacked_bar_y = [];} // y axis label is based from php query result
-                        
-    //                     var i = 0 ;
-    //                     for(i; i < response.length;i++){
-    //                         $.each(response[i], function(key, val){   
-                                        
-    //                             var memis_total = [];
-    //                             $.each(val, function(k,v){
-                                    
-    //                                 if(v.length > 0){
-
-    //                                     $.each(v, function(x, y){
-    //                                         memis_total.push(y.total);
-    //                                         if(stacked_bar_exemption == 1){stacked_bar_y.push(y.country_name);}
-    //                                         total += y.total;
-    //                                     });
-                
-    //                                     memis_labels.push({
-    //                                         name:k,
-    //                                         data:memis_total
-    //                                     })
-
-    //                                     memis_bgcolors.push('#000000'.replace(/0/g, function(){return (~~(Math.random()*16)).toString(16);}));
-    //                                 }
-    //                             });
-    //                         });
-    //                     }
-
-    //                     if(stacked_bar_exemption == 1){
-    //                         uniqueCountry = stacked_bar_y.filter(function(item, i, stacked_bar_y) {
-    
-                                
-    //                             return i == stacked_bar_y.indexOf(item);
-                            
-    //                         });
-    //                         uniqueCountry.sort();
-                            
-    //                         stacked_bar_y = [];
-    
-    //                         $.each(uniqueCountry.sort(), function(key, val){
-                                
-    //                             stacked_bar_y.push(val);
-    //                         });
-    //                     }
-
-    //                 }else{
-    //                     $('.no-data-found').remove();
-    //                     $('.no_data_available').after('<div class="alert alert-warning mt-4 no-data-found text-center" role="alert"> \
-    //                     <span class="fas fa-exclamation-triangle font-weight-bold"></span> NO DATA AVAILABLE. \
-    //                   </div>').hide().fadeIn();
-    //                 }
-    //             }
-    //         });
-
-            
-    //         exeChart = new Highcharts.chart('container', {
-    //             chart: {
-    //               type: 'bar',
-    //               events: {
-    //                 load: function() {
-    //                   var chart = this,
-    //                     barsLength = chart.series[0].data.length;
-              
-    //                   chart.update({
-    //                     chart: {
-    //                       height: 150 + (70 * stacked_bar_y.length)
-    //                     }
-    //                   }, true, false, false);
-    //                 }
-    //               }
-    //             },
-    //             title: {
-    //               text: bar_main_title
-    //             },
-    //             xAxis: {
-    //               categories: stacked_bar_y,
-    //               title: {
-    //                   text: 'Total Members (' + total + ')',
-    //                   align: 'high'
-    //               },
-    //               labels: {
-    //                   style: {
-    //                       fontSize:'14px'
-    //                   }
-    //               }
-    //             },
-    //             yAxis: {
-    //               min: 0,
-    //               title: {
-    //                 text: bar_sub_title
-    //               }
-    //             },
-    //             legend: {
-    //               reversed: true
-    //             },
-    //             tooltip: {
-    //                 headerFormat: '<b>{point.x}</b><br/>',
-    //                 pointFormat: '{series.name}: {point.y} ({point.percentage:.2f}%)<br/>'
-    //             },
-    //             plotOptions: {
-    //               series: {
-    //                 stacking: 'normal',
-    //                 pointWidth: '30',
-    //                 dataLabels: {
-    //                     enabled: true,
-    //                     formatter: function () {
-    //                         return this.y + ' (' + Math.round(100 * this.y / this.total) + '%)';
-    //                     },
-    //                 },
-    //               }
-    //             },
-    //             colors :  memis_bgcolors,
-    //             series: memis_labels
-    //           });
-
-    //           chart_rendered = 1;
-    //     }else if(chart == 4){ // column chart
-    //         chart_numbers = 1;
-    //         $('#chart_numbers').prop('checked', true); // Unchecks it
-    //         $('#chart_numbers').change(); // Unchecks it
-    //         chart_orientation = 2;
-    //         $('#chart_orientation').prop('checked', false); // Unchecks it
-    //         $('#chart_orientation').change(); // Unchecks it
-    //         chart_rendered = 1;
-
-    //         var memis_labels = [];
-    //         var memis_total = [];
-    //         var y_total = [];
-    //         var total = 0;
-            
-
-            
-    //         var start = $('#memis_start_year').val();
-    //         var end = $('#memis_end_year').val();
-    //         if(start > 0 && end > 0){
-    //             stacked_bar_y = [];
-    //             for (start; start <= end; start++) {
-    //                 stacked_bar_y.push(start);
-    //             }
-
-    //             bar_main_title = category_title + '(' + start + '-' + end + ')';
-    //         }
-
-    //         var period = $('#memis_period').val();
-    //         var month = 0, quarter = 0, semestral = 0;
-    //         var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    //         var quarters = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Qurter'];
-    //         var sems = ['1st Semestral', '2nd Semestral'];
-    //         if(period == 1){
-    //             stacked_bar_y = [];
-    //             for (month; month <  12; month++) {
-    //                 stacked_bar_y.push(months[month]);
-    //             }
-                
-    //             var p_year = (period_year > 0) ? ' '+ period_year : '';
-                
-    //             bar_main_title = category_title + '(Monthly' + p_year + ')';
-    //         }else if(period == 2){
-    //             stacked_bar_y = [];
-    //             for (quarter; quarter <  4; quarter++) {
-    //                 stacked_bar_y.push(quarters[quarter]);
-    //             }
-    //             bar_main_title = category_title + '(Quarterly' + p_year + ')';
-    //         }else if(period == 3){
-    //             stacked_bar_y = [];
-    //             for (semestral; semestral <  2; semestral++) {
-    //                 stacked_bar_y.push(sems[semestral]);
-    //             }
-    //             bar_main_title = category_title + '(Semestral' + p_year + ')';
-    //         }
-
-
-    //         $.ajax({
-    //             method: 'POST',
-    //             url: APP_URL + '/memis/column_graph',
-    //             async: false,
-    //             data:  $('#generate_chart_form').serialize(),
-    //             datatype: 'json',
-    //             success: function (response) {
-    //                 // console.log(response);
-    //                 if(response.length > 0){
-                        
-                        
-    //                     var i = 0 ;
-    //                     for(i; i < response.length;i++){
-    //                         $.each(response[i], function(key, val){   
-                                        
-    //                             var memis_total = [];
-    //                             $.each(val, function(k,v){
-                                    
-    //                                 if(v.length > 0){
-
-    //                                     $.each(v, function(x, y){
-    //                                             memis_total.push(y.total);
-    //                                             total += y.total;
-    //                                     });
-
-
-                                        
-    //                                     memis_labels.push({
-    //                                         name:k,
-    //                                         data:memis_total
-    //                                     })
-
-    //                                 }
-
-    //                             });
-
-                                
-    //                         });
-    //                     }
-                    
-    //                     chart_rendered = 1;
-    //                 }else{
-    //                     $('.no-data-found').remove();
-    //                     $('.no_data_available').after('<div class="alert alert-warning mt-4 no-data-found text-center" role="alert"> \
-    //                     <span class="fas fa-exclamation-triangle font-weight-bold"></span> NO DATA AVAILABLE. \
-    //                   </div>').hide().fadeIn();
-    //                 }
-    //             }
-    //         });
-
-    //         exeChart = new Highcharts.chart('container', {
-    //             chart: {
-    //               type: 'column',
-    //               events: {
-    //                 load: function() {
-    //                   var chart = this,
-    //                     barsLength = chart.series[0].data.length;
-              
-    //                   chart.update({
-    //                     chart: {
-    //                       height: 700
-    //                     }
-    //                   }, true, false, false);
-    //                 }
-    //               }
-    //             },
-    //             title: {
-    //               text: bar_main_title
-    //             },
-    //             xAxis: {
-    //               categories: stacked_bar_y
-    //             },
-    //             yAxis: {
-    //               min: 0,
-    //               title: {
-    //                 text: bar_sub_title
-    //               }
-    //             },
-    //             tooltip: {
-    //                 formatter: function() {
-    //                     var s = '<b>'+ this.x +'</b>', sum = 0;
-                             
-    //                     $.each(this.points, function(i, point) {
-    //                         sum += point.y;
-    //                     });     
-
-    //                     $.each(this.points, function(i, point) {
-    //                         s += '<br/><span style="color:{series.color};padding:0">'+ point.series.name +'</span>: '+
-    //                             point.y + '(' + (( point.y / sum) * 100).toFixed(2) + '%)';
-
-    //                     });                
-    //                     s += '<br/>Total: '+sum               
-    //                     return s;
-    //                 },
-    //                 shared: true,
-    //                 useHTML: true
-    //             },
-    //             legend: {
-    //               reversed: true
-    //             },
-    //             plotOptions: {
-    //                 column: {
-    //                     pointPadding: 1,
-    //                     borderWidth: 0,
-    //                     pointWidth: '30',
-    //                     dataLabels: {
-    //                         enabled: true,
-    //                         formatter:function() {
-    //                             return this.y ;
-    //                         }
-    //                     }
-    //                 }
-    //             },
-    //             series: memis_labels,
-    //           });
-                          
-    //     }else { // stack column chart
-            
-    //         chart_numbers = 1;
-    //         $('#chart_numbers').prop('checked', true); // Unchecks it
-    //         $('#chart_numbers').change(); // Unchecks it
-    //         chart_orientation = 2;
-    //         $('#chart_orientation').prop('checked', false); // Unchecks it
-    //         $('#chart_orientation').change(); // Unchecks it
-    //         chart_rendered = 1;
-
-    //         var memis_labels = [];
-    //         var memis_total = [];
-    //         var memis_bgcolors = [];
-    //         var y_total = [];
-    //         var total = 0;
-            
-
-            
-    //         var start = $('#memis_start_year').val();
-    //         var end = $('#memis_end_year').val();
-    //         if(start > 0 && end > 0){
-                
-    //             bar_main_title = category_title + '(' + start + '-' + end + ')';
-    //             stacked_bar_y = [];
-    //             for (start; start <= end; start++) {
-    //                 stacked_bar_y.push(start);
-    //             }
-
-    //         }
-    //         var period = $('#memis_period').val();
-    //         var month = 0, quarter = 0, semestral = 0;
-    //         var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    //         var quarters = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Qurter'];
-    //         var sems = ['1st Semestral', '2nd Semestral'];
-    //         var period_year = $('#memis_year').val();
-
-    //         if(period == 1){
-    //             stacked_bar_y = [];
-    //             for (month; month <  12; month++) {
-    //                 stacked_bar_y.push(months[month]);
-    //             }
-                
-    //             var p_year = (period_year > 0) ? period_year : '';
-                
-    //             bar_main_title = category_title + '(Monthly ' + p_year + ')';
-    //         }else if(period == 2){
-    //             stacked_bar_y = [];
-    //             for (quarter; quarter <  4; quarter++) {
-    //                 stacked_bar_y.push(quarters[quarter]);
-    //             }
-    //             bar_main_title = category_title + '(Quarterly ' + p_year + ')';
-    //         }else if(period == 3){
-    //             stacked_bar_y = [];
-    //             for (semestral; semestral <  2; semestral++) {
-    //                 stacked_bar_y.push(sems[semestral]);
-    //             }
-    //             bar_main_title = category_title + '(Semestral ' + p_year + ')';
-    //         }
-
-
-    //         $.ajax({
-    //             method: 'POST',
-    //             url: APP_URL + '/memis/stack_column_graph',
-    //             async: false,
-    //             data:  $('#generate_chart_form').serialize(),
-    //             datatype: 'json',
-    //             success: function (response) {
-    //                 if(response.length > 0){
-                    
-    //                     var i = 0 ;
-    //                     for(i; i < response.length;i++){
-    //                         $.each(response[i], function(key, val){   
-    //                             var memis_total = [];
-    //                             $.each(val, function(k,v){
-    //                                 if(v.length > 0){
-
-    //                                     $.each(v, function(x, y){
-    //                                             memis_total.push(y.total);
-    //                                             total += y.total;
-    //                                     });
-
-    //                                     memis_labels.push({
-    //                                         name:k,
-    //                                         data:memis_total,
-    //                                         stack: 'STACK'
-    //                                     })
-
-    //                                     memis_bgcolors.push('#000000'.replace(/0/g, function(){return (~~(Math.random()*16)).toString(16);}));
-
-    //                                 }
-
-    //                             });
-    //                         });
-    //                     }
-                    
-    //                     chart_rendered = 1;
-    //                 }else{
-    //                     $('.no-data-found').remove();
-    //                     $('.no_data_available').after('<div class="alert alert-warning mt-4 no-data-found text-center" role="alert"> \
-    //                     <span class="fas fa-exclamation-triangle font-weight-bold"></span> NO DATA AVAILABLE. \
-    //                   </div>').hide().fadeIn();
-    //                 }
-    //             }
-    //         });
-
-    //         exeChart = new Highcharts.chart('container', {
-
-    //             chart: {
-    //                 type: 'column',
-    //                 events: {
-    //                   load: function() {
-    //                     var chart = this,
-    //                       barsLength = chart.series[0].data.length;
-                
-    //                     chart.update({
-    //                       chart: {
-    //                         height: 700
-    //                       }
-    //                     }, true, false, false);
-    //                   }
-    //                 }
-    //             },
-            
-    //             title: {
-    //                 text: bar_main_title
-    //             },
-            
-    //             xAxis: {
-    //                 categories: stacked_bar_y
-    //             },
-    //             yAxis: {
-    //               min: 0,
-    //               title: {
-    //                 text: bar_sub_title
-    //               }
-    //             },
-    //             tooltip: {
-    //                 formatter: function () {
-    //                     return '<b>' + this.x + '</b><br/>' +
-    //                         this.series.name + ': ' + this.y + '<br/>' +
-    //                         'Total: ' + this.point.stackTotal;
-    //                 }
-    //             },
-    //             plotOptions: {
-    //                 column: {
-    //                     stacking: 'normal',
-    //                     pointPadding: 1,
-    //                     borderWidth: 0,
-    //                     pointWidth: '30',
-    //                     dataLabels: {
-    //                         enabled: true,
-    //                         formatter:function() {
-    //                             return this.y ;
-    //                         }
-    //                     }
-    //                 }
-    //             },
-    //             colors :  memis_bgcolors,
-    //             series: memis_labels
-    //         });
-                     
-    //     }
-
-    //     e.preventDefault();
-    // });
-
+    // show/hide chart numbers
     $('#chart_numbers').change(function(e){
-        
         if(chart_rendered > 0){
             if($(this).is(":checked")){
                 chart_numbers = 1;
                 if(chart_orientation == 1){
-
                     if(selected_chart == 8){
                         exeChart.update({
                             plotOptions: {
@@ -2849,6 +1962,7 @@ $(document).ready(function(){
 
     });
 
+    // change chart orinetation to landscape/portrait
     $('#chart_orientation').change(function(e){
         // var chart_type = $('input[name="radio_generate_chart"]:checked').val();
         var datalabels = (chart_numbers == 1) ? true : false;
@@ -2991,11 +2105,12 @@ $(document).ready(function(){
         }
     });
 
+    // reset filters (MemIS)
     $('#reset_filters').click(function(){
         $('#generate_chart_form')[0].reset();
         $('#generate_chart_form input:radio[name="radio_default"]').parent().remove();
         $('#generate_chart_form input:radio[name="radio_generate_chart"]').attr('disabled', true);
-        $('.no-data-found, .chart_filter_alert, .chart_radio_alert').remove();
+        $('.no-data-found, .chart_filter_alert').remove();
         $('#generate_chart_form select').removeClass('bg bg-dark text-white font-weight-bold');
 
         $('#graph_tab .nav-link').removeClass('text-success').addClass('disabled');
@@ -3007,10 +2122,10 @@ $(document).ready(function(){
 
     });
 
-    $('#generate_chart_form input:radio').change(function(){
-        $('.chart_radio_alert').fadeOut('slow');
-    });
-
+    
+    // Filters in MemIS
+     
+    // validation in Island Groups filter
     $("#memis_island").change(function(e){
         category_title = 'Members by Island ';
         if($(this).val() > 0){
@@ -3095,6 +2210,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Island Groups as default Y-axis/label
     $(document).on('click','.main_label_island',function(){
         stacked_bar_y = [];
 
@@ -3106,6 +2222,7 @@ $(document).ready(function(){
             });
     });
 
+    // validation in Divisions filter
     $("#memis_division").change(function(e){
         category_title = 'Members by Division ';
         if($(this).val() > 0){
@@ -3192,6 +2309,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Divisions as default Y-axis/label
     $(document).on('click','.main_label_division',function(){
         stacked_bar_y = [];
 
@@ -3203,6 +2321,7 @@ $(document).ready(function(){
             });
     });
 
+    // validation in Regions filter
     $("#memis_region").change(function(e){
         category_title = 'Members by Region ';
         if($(this).val() > 0){
@@ -3315,6 +2434,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Regions as default Y-axis/label
     $(document).on('click','.main_label_region',function(){
         stacked_bar_y = [];
 
@@ -3326,6 +2446,7 @@ $(document).ready(function(){
             });
     });
  
+    // validation in Province filter
     $("#memis_province").change(function(e){
         category_title = 'Members by Province ';
         if($(this).val() > 0){
@@ -3438,6 +2559,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Province as default Y-axis/label
     $(document).on('click','.main_label_province',function(){
         stacked_bar_y = [];
 
@@ -3449,6 +2571,7 @@ $(document).ready(function(){
             });
     });
 
+    // validation in City filter
     $("#memis_city").change(function(e){
         category_title = 'Members by City ';
         if($(this).val() > 0){
@@ -3544,6 +2667,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set City as default Y-axis/label
     $(document).on('click','.main_label_city',function(){
         stacked_bar_y = [];
 
@@ -3555,6 +2679,7 @@ $(document).ready(function(){
             });
     });
     
+    // validation in Category filter
     $("#memis_category").change(function(e){
 
         category_title = 'Members by Category ';
@@ -3564,38 +2689,25 @@ $(document).ready(function(){
             $(this).removeClass('bg bg-dark text-white font-weight-bold');
         }
 
-        // if($(this).val() > 0){
-            
-            if($(this).val() == '999'){
-                bar_main_title = 'Members by Category as of ' + moment().format("MMM DD, YYYY");
-                $(this).parent().append('<div class="custom-control custom-radio main_label_category mt-2 "> \
-                    <input type="radio" id="default_category" name="radio_default" class="custom-control-input" value="memis_category" checked> \
-                    <label class="custom-control-label" for="default_category">Set as default Y-axis label</label> \
-                    <i class="far fa-question-circle text-muted" data-toggle="tooltip" data-placement="top" title="What is Y-axis Label?" onclick="chart_info(999)"></i> \
-                </div>').fadeIn('slow');
-    
-                stacked_bar_y = [];
-    
-                $("#memis_category option").each(function() {
-                    if($(this).val() > 0 && $(this).val() != 999){
-                        // stacked_bar_y.push($(this).val());
-                        stacked_bar_y.push($(this).text());
-    
-                    }
-                });
-    
-    
-            }
-        //     else{
-        //         $('#memis_start_year, #memis_end_year').attr('disabled', false);  
-        //         $('.main_label_category').fadeOut('slow');
-        //     }
-        // }
-        // else{
-        //     $('#memis_start_year, #memis_end_year').attr('disabled', true);  
-        //     $('.main_label_category').fadeOut('slow');
-        // }
+        if($(this).val() == '999'){
+            bar_main_title = 'Members by Category as of ' + moment().format("MMM DD, YYYY");
+            $(this).parent().append('<div class="custom-control custom-radio main_label_category mt-2 "> \
+                <input type="radio" id="default_category" name="radio_default" class="custom-control-input" value="memis_category" checked> \
+                <label class="custom-control-label" for="default_category">Set as default Y-axis label</label> \
+                <i class="far fa-question-circle text-muted" data-toggle="tooltip" data-placement="top" title="What is Y-axis Label?" onclick="chart_info(999)"></i> \
+            </div>').fadeIn('slow');
 
+            stacked_bar_y = [];
+
+            $("#memis_category option").each(function() {
+                if($(this).val() > 0 && $(this).val() != 999){
+                    // stacked_bar_y.push($(this).val());
+                    stacked_bar_y.push($(this).text());
+
+                }
+            });
+        }
+   
         $('.chart_filter_alert').fadeOut('slow');
         var selections = [];
         var filter_counter = 0; // selected filters
@@ -3651,6 +2763,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Category as default Y-axis/label
     $(document).on('click','.main_label_category',function(){
         stacked_bar_y = [];
 
@@ -3662,6 +2775,7 @@ $(document).ready(function(){
             });
     });
 
+    // validation in Status filter
     $("#memis_status").change(function(e){
         category_title = 'Members by Status ';
         if($(this).val() > 0){
@@ -3748,6 +2862,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Status as default Y-axis/label
     $(document).on('click','.main_label_status',function(){
         stacked_bar_y = [];
 
@@ -3759,6 +2874,7 @@ $(document).ready(function(){
             });
     });
     
+    // validation in Sex filter
     $("#memis_sex").change(function(e){
         category_title = 'Members by Sex ';
         if($(this).val() > 0){
@@ -3847,6 +2963,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Sex as default Y-axis/label
     $(document).on('click','.main_label_sex',function(){
         stacked_bar_y = [];
 
@@ -3858,6 +2975,7 @@ $(document).ready(function(){
             });
     });
     
+    // validation in Age filter
     $("#memis_age").change(function(e){
         category_title = 'Members by Age ';
         if($(this).val() > 0){
@@ -3944,6 +3062,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Age as default Y-axis/label
     $(document).on('click','.main_label_age',function(){
         stacked_bar_y = [];
 
@@ -3955,6 +3074,7 @@ $(document).ready(function(){
             });
     });
  
+    // validation in Highest Educational Attainment filter
     $("#memis_educ").change(function(e){
         category_title = 'Members by Educational ';
         if($(this).val() > 0){
@@ -4041,6 +3161,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Highest Educational Attainment as default Y-axis/label
     $(document).on('click','.main_label_educ',function(){
         stacked_bar_y = [];
 
@@ -4052,6 +3173,7 @@ $(document).ready(function(){
             });
     });
 
+    // validation in Year filter in Periodical
     $("#memis_year").change(function(e){
 
         if($(this).val() > 0){
@@ -4063,6 +3185,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // validation in Start Year filter in Duration
     $("#memis_start_year").change(function(e){
 
         if($(this).val() > 0){
@@ -4078,6 +3201,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // validation in End Year filter in Duration
     $("#memis_end_year").change(function(e){
 
         if($(this).val() > 0){
@@ -4093,6 +3217,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // validation in Period filter in Periodical
     $("#memis_period").change(function(e){
         
         if($(this).val() > 0){
@@ -4109,6 +3234,7 @@ $(document).ready(function(){
 
     });
 
+    // validation in Country filter
     $("#memis_country").change(function(e){
 
         if($(this).val() > 0){
@@ -4185,6 +3311,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // set Country as default Y-axis/label
     $(document).on('click','.main_label_country',function(){
         stacked_bar_y = [];
 
@@ -4196,6 +3323,7 @@ $(document).ready(function(){
             });
     });
 
+    // backup database all structure only
     $("#select_all_structure").change(function() {
         if (this.checked) {
             $("input[name='table_structure[]']").each(function() {
@@ -4208,6 +3336,7 @@ $(document).ready(function(){
         }
     });
 
+    // backup database data only
     $("#select_all_data").change(function() {
         if (this.checked) {
             $("input[name='table_data[]']").each(function() {
@@ -4220,22 +3349,27 @@ $(document).ready(function(){
         }
     });
 
+    // hide strucutre/data table initially
     $('#sd_table').hide();
 
+    // hide strucutre/data table if quick export
     $('#quick_export').change(function(){
 
         $('#sd_table').hide();
     });
 
+    // show strucutre/data table if custom export
     $('#custom_export').change(function(){
 
         $('#sd_table').show();
     });
 
+    // import sql file
     $('#import_file').change(function(){
         $('.custom-file-label').text($(this).val().split('\\').pop());
     });
 
+    // submit file to import
     $("#import_db_form").validate({
         debug: true,
         errorClass: 'text-danger',
@@ -4274,10 +3408,12 @@ $(document).ready(function(){
         }
     });
 
+    // show password strenght every press
     $('#password').keyup(function(){
         $('#result').html(checkStrength($('#password').val()))
     })  
 
+    // resend login otp
     $('#resend_login_otp').click(function(){
         var crypted_email = window.location.pathname.split("/").pop();
 
@@ -4300,6 +3436,7 @@ $(document).ready(function(){
         });
     });
 
+    // resent reset otp
     $('#resend_reset_otp').click(function(){
         var crypted_email = window.location.pathname.split("/").pop();
 
@@ -4322,20 +3459,22 @@ $(document).ready(function(){
         });
     });
 
+    // not available
     $(document).on('change', '#awards_per_year', function(){
         $('#member_table').DataTable().search($(this).val()).draw();
     });
 
+    // not available
     $(document).on('change', '#awards_per_division', function(){
         $('#member_table').DataTable().search($(this).val()).draw();
     });
 
+    // display CSF graph and table
     $('#memis_csf').click(function(){
 
         if ($.fn.DataTable.isDataTable("#csf_table")) {
             $('#csf_table').DataTable().clear().destroy();
         }
-
 
         $('#csf_graph_modal').modal('toggle');
         $('#csf_graph_modal .modal-title').text('MemIS : Customer Service Feedback');
@@ -4464,13 +3603,12 @@ $(document).ready(function(){
         } ).draw();
 
     });
-
 });
-
 
 // FUNCTIONS
 
-// graphs
+// MEMIS
+// generate basic bar graph from dashboard (MEMIS)
 function basic_graph_memis(id,title){
 
     chart_numbers = 1;
@@ -4631,6 +3769,7 @@ function basic_graph_memis(id,title){
         });
 }
 
+// generate basic bar graph from dashboard (BRIS)
 function basic_graph_bris(id,title){
     
             
@@ -4781,6 +3920,7 @@ function basic_graph_bris(id,title){
         });
 }
 
+// show list of eournal per labels from dashboard
 function ejournal(val, title, config = null){
 
     if ($.fn.DataTable.isDataTable("#ejournal_table")) {
@@ -4929,6 +4069,7 @@ function ejournal(val, title, config = null){
     } ).draw();
 }
 
+// show list of LMS per labels from dashboard
 function librarysys(id, title){  
 
     if ($.fn.DataTable.isDataTable("#library_table")) {
@@ -5005,6 +4146,7 @@ function librarysys(id, title){
     } ).draw();
 }
 
+// show list of members per labels from dashboard 
 function members(filter, id, title){
 
     if ($.fn.DataTable.isDataTable("#member_table")) {
@@ -5227,6 +4369,7 @@ function members(filter, id, title){
     });
 }
 
+// show list of NRCPnet per labels from dashboard
 function nrcpnet(filter, title){
 
     if ($.fn.DataTable.isDataTable("#nrcpnet_table")) {
@@ -5304,6 +4447,7 @@ function nrcpnet(filter, title){
     
 }
 
+// show list of BRIS projects per labels from dashboard
 function bris_project(filter, title){
 
     if ($.fn.DataTable.isDataTable("#bris_table")) {
@@ -5385,6 +4529,7 @@ function bris_project(filter, title){
 
 }
 
+// show list of BRIS NIBRA per labels from dashboard
 function bris_nibra(filter, title){
 
     if ($.fn.DataTable.isDataTable("#bris_table")) {
@@ -5458,6 +4603,7 @@ function bris_nibra(filter, title){
     });
 }
 
+// show list of BRIS DOST agendas per labels from dashboard
 function bris_agenda(filter, title){
 
     if ($.fn.DataTable.isDataTable("#bris_table")) {
@@ -5529,6 +4675,7 @@ function bris_agenda(filter, title){
     });
 }
 
+// show list of BRIS programs per labels from dashboard
 function bris_program(filter, title){
     
     if ($.fn.DataTable.isDataTable("#bris_table")) {
@@ -5604,6 +4751,7 @@ function bris_program(filter, title){
     });
 }
 
+// show list of ExeCom IS users from upper right nav
 function execom_users(){
 
     if ($.fn.DataTable.isDataTable("#execom_table")) {
@@ -5645,6 +4793,7 @@ function execom_users(){
 
 }
 
+// show list of all users from upper right nav
 function all_users(){
 
     
@@ -5749,6 +4898,7 @@ function all_users(){
     
 }
 
+// add execom user
 function add_user(id){
 
 
@@ -5769,6 +4919,7 @@ function add_user(id){
     });
 }
 
+// show list of activity logs from upper right nav
 function activity_logs(){
 
     
@@ -5813,6 +4964,7 @@ function activity_logs(){
     });
 }
 
+// remove user
 function remove_user(id){
     $.ajaxSetup({
         headers: {
@@ -5831,7 +4983,7 @@ function remove_user(id){
     });
 }
 
-
+// display results from quick search
 function show_overall(keyword){
 
     $('#overall_modal').modal('toggle');
@@ -5884,6 +5036,7 @@ function show_overall(keyword){
 
 }
 
+// serach from employess
 function net_employees(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#nrcpnet_employee_table")) {
@@ -5955,6 +5108,7 @@ function net_employees(keyword, sys, section){
     });
 }
 
+// serach from division
 function net_divisions(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#nrcpnet_division_table")) {
@@ -6025,6 +5179,7 @@ function net_divisions(keyword, sys, section){
     });
 }
 
+// serach from LMS
 function lms_all(keyword, sys, section){
 
 
@@ -6115,6 +5270,7 @@ function lms_all(keyword, sys, section){
     });
 }
 
+// serach from eJournal titles
 function ej_titles(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#ejournal_title_table")) {
@@ -6184,6 +5340,7 @@ function ej_titles(keyword, sys, section){
     });
 }
 
+// serach from ejournal authors
 function ej_authors(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#ejournal_author_table")) {
@@ -6252,6 +5409,7 @@ function ej_authors(keyword, sys, section){
     });
 }
 
+// serach from BRIS projects
 function bris_projects_ov(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#bris_project_table")) {
@@ -6334,6 +5492,7 @@ function bris_projects_ov(keyword, sys, section){
     });
 }
 
+// get coordinators from BRIS
 function get_coordinator(){
 
     $.ajaxSetup({
@@ -6359,6 +5518,7 @@ function get_coordinator(){
     // return (user == undefined) ? '-' : user;
 }
 
+// serach from BRIS programs
 function bris_programs_ov(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#bris_program_table")) {
@@ -6439,6 +5599,7 @@ function bris_programs_ov(keyword, sys, section){
     });
 }
 
+// serach from BRIS proposal
 function bris_proposals_ov(keyword, sys, section){
     var search_arr = {};
 
@@ -6488,6 +5649,7 @@ function bris_proposals_ov(keyword, sys, section){
     });
 }
 
+// search from MEMIS specializations
 function memis_specializations(keyword, sys, section){
 
     
@@ -6574,6 +5736,7 @@ function memis_specializations(keyword, sys, section){
     
 }
 
+// search from members
 function memis_members(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#memis_members_table")) {
@@ -6653,6 +5816,7 @@ function memis_members(keyword, sys, section){
     });
 }
 
+// search from awards
 function memis_awards(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#memis_awards_table")) {
@@ -6731,6 +5895,7 @@ function memis_awards(keyword, sys, section){
     });
 }
 
+// search from governing boards
 function memis_gbs(keyword, sys, section){
 
     if ($.fn.DataTable.isDataTable("#memis_gbs_table")) {
@@ -6812,6 +5977,7 @@ function memis_gbs(keyword, sys, section){
     });
 }
 
+// download/view LMS pdf
 function download(id){
 
     // console.log(id);
@@ -6826,15 +5992,7 @@ function download(id){
     });
 }
 
-function memis_graph(val){
-    // window.location('/memis');
-}
-
-// show data on clicking bar chart
-function show_table_ejournal(data){
- alert(data);      
-}
-
+// verify if user submited feedback already
 function verify_feedback(){
 
     var jqXHR = $.ajax({
@@ -6853,6 +6011,7 @@ function verify_feedback(){
     }
 }
 
+// view ExeCom IS internal users feedbacks
 function view_feedbacks(){
 
     if ($.fn.DataTable.isDataTable("#feedback_table")) {
@@ -6998,6 +6157,7 @@ function view_feedbacks(){
     $('.fb_notif .close').click();
 }
 
+// unused for now
 function per_province(name, id){
     $('#perProvince .modal-title').text(name);
 
@@ -7057,7 +6217,7 @@ function per_province(name, id){
 
 }
 
-
+// display chart description
 function chart_info(id){
         var source = '';
         var title = '';
@@ -7101,6 +6261,7 @@ function chart_info(id){
 
 }
 
+// validate password strength
 function checkStrength(password){
  
     //initial strength
@@ -7165,6 +6326,7 @@ function checkStrength(password){
     }
 }
 
+// dsiplay members from clicked bar in graph
 function click_overall(id, filter){
 
     // alert(id + ' ' + filter);
@@ -7297,6 +6459,7 @@ function click_overall(id, filter){
     });
 }
 
+// get province for drilldown of region
 function get_drilldown(id){
 
     var drilldown = [];
@@ -7325,6 +6488,7 @@ function get_drilldown(id){
     
 }
 
+// generate chart for MEMIS advanced
 function memis_generate_chart(chart){
         var default_x = $('input[type=radio]:checked').attr('id');
         selected_chart = chart;
@@ -8583,7 +7747,7 @@ function memis_generate_chart(chart){
 
 }
 
-
+// convert color
 function toHex(n) {
     var h = (~~n).toString(16);
     if (h.length < 2)
