@@ -12,11 +12,25 @@ class Execom extends Model
 
     protected $table = 'users';
 
-    // protected $fillable = ['email'];
+   
 
-    static function get_users(){
-        return DB::table('users')->where('id','!=', Auth::id())->get();
+    protected $fillable = ['name','email','password','role','status'];
+
+    public function getTableColumns($tbl) {
+
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($tbl);
+
     }
+
+
+    static function get_users($id){
+        if($id != null){
+            return DB::table('users')->where('user_id', $id)->get();
+        }else{
+            return DB::table('users')->where('user_id','!=', Auth::id())->get();
+        }
+    }
+
 
     static function add_user($id){
         $skms = DB::connection('dbskms')->table('tblusers')

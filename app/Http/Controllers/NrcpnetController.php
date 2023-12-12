@@ -6,12 +6,18 @@ use Illuminate\Http\Request;
 use App\Nrcpnet;
 use App\Logs;
 use Auth;
+use Browser;
 
 /**
  * manages NRCPnet data
  */
 class NrcpnetController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     private $ipaddress;
 
@@ -47,11 +53,17 @@ class NrcpnetController extends Controller
      * @return void
      */
     public function get_plant(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'NRCPnet Plantilla Personnel', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Nrcpnet::get_plantillas()');
 
@@ -71,11 +83,17 @@ class NrcpnetController extends Controller
      * @return void
      */
     public function get_cont(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'NRCPnet Contractual Personnel', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Nrcpnet::get_contractuals()');
 
@@ -94,11 +112,17 @@ class NrcpnetController extends Controller
      * @return void
      */
     public function get_jo(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'NRCPnet Job Orders', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Nrcpnet::get_jos()');
 
@@ -117,11 +141,17 @@ class NrcpnetController extends Controller
      * @return void
      */
     public function get_vac(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'NRCPnet Vacant Position', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__);
 
         Logs::create($logs);

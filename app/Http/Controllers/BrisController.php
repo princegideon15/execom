@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use App\Research;
 use App\Logs;
 use Auth;
+use Browser;
 
 // generate random color for basic bar graph only
 // for local use
 include(app_path() . '\Colors\RandomColor.php');
 
 // generate random color for basic bar graph only
-// for local use
+// for server use
 // include(app_path() . '/Colors/RandomColor.php'); 
 use \Colors\RandomColor;
 
@@ -22,7 +23,11 @@ use \Colors\RandomColor;
  */
 class BrisController extends Controller
 {
-
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     private $ipaddress;
 
     /**
@@ -101,9 +106,15 @@ class BrisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : BRIS : Projects Per Status", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -136,9 +147,15 @@ class BrisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : BRIS : Nibras", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -171,9 +188,15 @@ class BrisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : BRIS : Dost Agendas", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -206,9 +229,15 @@ class BrisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : BRIS : Programs Per Status", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -342,10 +371,16 @@ class BrisController extends Controller
      */
     public function get_project_status(Request $req){
         
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'BRIS Projects', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Research::get_project_status()');
 
@@ -361,11 +396,16 @@ class BrisController extends Controller
      * @return void
      */
     public function get_nibra_by_id(Request $req){
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'BRIS Nibra', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Research::get_nibra_by_id()');
 
@@ -382,10 +422,16 @@ class BrisController extends Controller
      */
     public function get_dost_agenda_by_id(Request $req){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'BRIS Agendas',
-        'log_ip_address' => $this->get_ip(), 
+        'log_ip_address' => $ip, 
+        'log_user_agent' => $os, 
+        'log_browser' => $browser, 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Research::get_dost_agenda_by_id()');
 
@@ -402,10 +448,16 @@ class BrisController extends Controller
      */
     public function get_program_status(Request $req){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'BRIS Programs', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Research::get_program_status()');
 
@@ -488,4 +540,48 @@ class BrisController extends Controller
     {
         //
     }
+
+    /**
+     * Get CSF from BRIS database
+     *
+     * @return void
+     */
+    public function get_csf_list(){
+        return Research::get_csf_list();
+    }
+
+    public function get_csf_desc($id, $user){
+        return Research::get_csf_desc($id, $user);
+    }
+
+    public function get_csf_answers($user){
+        return Research::get_csf_answers($user);
+    }
+
+    /**
+     * Get Customer service feedback
+     *
+     * @return void
+     */
+    public function get_csf($id){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $csf = Research::get_csf($id);
+
+        $logs = array('log_user_id' => Auth::id(), 
+        'log_email' => Auth::user()->email, 
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_description' => "Graph : BRIS : Customer Service Feedback", 
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
+
+        Logs::create($logs);
+
+        return $csf;
+    }
+
 }

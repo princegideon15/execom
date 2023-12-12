@@ -72,45 +72,32 @@ class Member extends Model
     }
 
     static function get_regions(){
-        
-        // $query = DB::select('SELECT region_id, region_name, COUNT(emp_usr_id) as total '.
-        // $query = DB::select('SELECT IFNULL(region_id, 0) as region_id, IFNULL(region_name,"Overseas") as region_name, COUNT(emp_usr_id) as total '.
-        
-        // $query = DB::select('SELECT region_id, region_name, COUNT(emp_usr_id) as total '.
-        // 'FROM ( SELECT emp_usr_id, region_name, region_id, '.
-        // 'COUNT(case when emp_period_to = "Present" then emp_period_to end) as PRESENT  '.
-        // 'FROM new_dbskms.tblemployments '.
-        // 'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        // ' JOIN new_dbskms.tblregions ON region_id = emp_region '.
-        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        // 'WHERE usr_grp_id like 3 AND mem_status != 3 '.
-        // 'GROUP BY emp_usr_id having PRESENT > 0 '.
-        // 'UNION ALL '.
-        // 'SELECT emp_usr_id, region_name, region_id, '.
-        // 'COUNT(CASE WHEN emp_period_to = "Present" THEN emp_period_to END) as PRESENT '.
-        // 'FROM new_dbskms.tblemployments '.
-        // 'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        // ' JOIN new_dbskms.tblregions ON region_id = emp_region '.
-        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        // 'WHERE usr_grp_id like 3  AND mem_status != 3 '. 
-        // 'GROUP BY emp_usr_id HAVING PRESENT = 0 '.
-        // ') as q '.
-        // 'GROUP BY region_id');  
 
-        $query = DB::select('SELECT region_id, region_name, COUNT(emp_usr_id) as total '.
-        'FROM ( SELECT emp_usr_id, region_name, region_id, usr_id '.
-        'FROM new_dbskms.tblemployments '.
-        'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        ' JOIN new_dbskms.tblregions ON region_id = emp_region '.
-        'WHERE usr_grp_id like 3 AND mem_status != 3 '.
-        'AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments where emp_usr_id = usr_id ) '.
-        'GROUP BY emp_usr_id ' .
+        // SELECT emp_id, emp_usr_id, region_name FROM tblpersonal_profiles
+        // inner join tblusers on usr_id = pp_usr_id
+        // left join tblemployments on emp_usr_id = pp_usr_id
+        // left join tblmembers on mem_usr_id = emp_usr_id
+        // left join tblregions on region_id = emp_region
+        // WHERE usr_grp_id = 3 and mem_status != 3 and mem_status is not null and emp_country = 175 and emp_region > 0 and emp_id IN 
+        // (SELECT max(emp_id) as emp_id
+        // FROM tblemployments 
+        // GROUP by emp_usr_id 
+        // ORDER by emp_id DESC);
+
+        return DB::select('SELECT region_id, region_name, COUNT(emp_id) as total '.
+        'FROM ( SELECT emp_usr_id, region_name, region_id, usr_id, emp_id '.
+        'FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = emp_usr_id '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'WHERE usr_grp_id like 3 AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country = 175 AND emp_region > 0 '.
+        'AND emp_id IN (SELECT MAX(emp_id) AS emp_id
+        FROM new_dbskms.tblemployments 
+        GROUP by emp_usr_id 
+        ORDER by emp_id DESC) '.
         ') as q '.
-        'GROUP BY region_id');  
-
-    
-        return $query; 
+        'GROUP BY region_id');
     }
 
     static function get_regions_list(){
@@ -183,18 +170,23 @@ class Member extends Model
     static function per_region($id){
 
         $query = DB::select('SELECT *, TITLE, PROVINCE, CITY, sex '.
-        'FROM ( SELECT pp.*, (select title_name from new_dbskms.tbltitles where title_id like pp_title) as TITLE, '.
-        '(select province_name from new_dbskms.tblprovinces where province_id like emp_province) as PROVINCE, '.
-        '(select city_name from new_dbskms.tblcities where city_id like emp_city) as CITY, '.
-        '(select sex from new_dbskms.tblsex where s_id like pp_sex) as sex '.
-        'FROM new_dbskms.tblemployments '.
-        'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-        'LEFT JOIN new_dbskms.tblpersonal_profiles as pp ON pp_usr_id = emp_usr_id '.
-        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-        ' JOIN new_dbskms.tblregions ON emp_region = region_id '.
-        'WHERE usr_grp_id like 3  AND mem_status != 3  '.
+        'FROM ( SELECT new_dbskms.tblpersonal_profiles.*, title_name AS TITLE, province_name AS PROVINCE, city_name AS CITY, sex '.
+        'FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'LEFT JOIN new_dbskms.tblprovinces ON province_id = emp_province '.
+        'LEFT JOIN new_dbskms.tblcities ON city_id = emp_city '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'WHERE usr_grp_id like 3  AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country = 175 '.
         'AND emp_region = '. $id . ' '.
-        'AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments where emp_usr_id = usr_id ) '.
+        'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '.
+        'FROM new_dbskms.tblemployments '.
+        'GROUP by emp_usr_id '.
+        'ORDER by emp_id DESC) '.
         'GROUP BY emp_usr_id '.
         ') as q');  
 
@@ -302,19 +294,29 @@ class Member extends Model
         return $query->get();
     }
 
-    static function search_gb($keyword){//todo
+    static function search_gb($keyword){
+
+        // return DB::connection('dbskms')->table('tblpersonal_profiles')
+        // ->select('*'
+        // ,DB::connection('dbskms')->raw('(select title_name from tbltitles where title_id like pp_title) as TITLE')advanced_search_gb
+        // ,DB::connection('dbskms')->raw('(select div_number from tbldivisions where div_id like division_id) as div_number'))
+        // ->join('tblposition_held_nrcp','pp_usr_id','=','ph_usr_id')
+        // ->join('tblnrcp_positions', 'ph_pos', '=', 'pos_id')
+        // ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
+        // ->where('division_id', '>', '0')
+        // ->orderBy('division_id', 'asc')
 
         $query = DB::connection('dbskms')->table('tblpersonal_profiles')
             ->select('*'
             ,DB::connection('dbskms')->raw('(SELECT title_name FROM tbltitles WHERE title_id LIKE pp_title) AS TITLE')
             ,DB::connection('dbskms')->raw('(SELECT div_number FROM tbldivisions WHERE div_id LIKE pos_div_id) AS div_number'))
-            ->join('tblposition_held_nrcp','ph_usr_id','=','pp_usr_id')
-            ->join('tblnrcp_positions', 'pos_id', '=', 'ph_usr_id')
+            ->join('tblposition_held_nrcp','pp_usr_id','=','ph_usr_id', 'left')
+            ->join('tblnrcp_positions', 'ph_pos', '=', 'pos_id')
             ->join('tblsex','s_id','=','pp_sex');
 
         if($keyword != null){
-            $query->where('pp_first_name', 'LIKE', '%' . $keyword .'%')
-            ->orWhere('pp_last_name', 'Like', '%' . $keyword . '%');
+            $query->where('pp_last_name', 'LIKE', '%' . $keyword .'%')
+            ->orWhere('pp_last_name', 'LIKE', '%' . $keyword . '%');
         }
         
         $query->orderBy('pp_last_name', 'asc');
@@ -327,19 +329,19 @@ class Member extends Model
             ->select('*'
             ,DB::connection('dbskms')->raw('(select title_name from tbltitles where title_id like pp_title) as TITLE')
             ,DB::connection('dbskms')->raw('(select div_number from tbldivisions where div_id like pos_div_id) as div_number'))
-            ->join('tblposition_held_nrcp','ph_usr_id','=','pp_usr_id')
-            ->join('tblnrcp_positions', 'pos_id', '=', 'ph_usr_id')
-            ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
-            ->where('pp_first_name', 'LIKE', '%' . $keyword .'%')
-            ->orWhere('pp_last_name', 'Like', '%' . $keyword . '%');
+            ->join('tblposition_held_nrcp','ph_usr_id','=','pp_usr_id', 'left')
+            ->join('tblnrcp_positions', 'ph_pos', '=', 'pos_id')
+            ->join('tblsex', 's_id', '=', 'pp_sex')
+            ->where('pp_last_name', 'LIKE', '%' . $keyword .'%')
+            ->orWhere('pp_last_name', 'LIKE', '%' . $keyword . '%');
 
-        if($division != null){
-            $query->where('division_id', $division)
-            ->orderBy('division_id', 'asc');
+        if($division > 0){
+            $query->where('division_id', $division);
         }
 
-        if($year != null){
-            $query->where(DB::raw("CONCAT(ph_from,' ',ph_to)"), 'LIKE', '%' . $year . '%');
+        if($year > 0){
+            $query->where('ph_from', 'LIKE', '%' . $year .'%')
+            ->orWhere('ph_to', 'Like', '%' . $year . '%');
         }
       
         $query->orderBy('pp_last_name', 'asc');
@@ -368,7 +370,7 @@ class Member extends Model
             ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
             ->where('division_id', '>', '0')
             ->orderBy('division_id', 'asc')
-            ->orderBy('pp_last_name', 'asc')
+            // ->orderBy('pp_last_name', 'asc')
             ->get();
         }else{
             return DB::connection('dbskms')->table('tblpersonal_profiles')
@@ -377,7 +379,7 @@ class Member extends Model
             ->join('tblposition_held_nrcp','pp_usr_id','=','ph_usr_id')
             ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
             ->where('ph_pos', $id)
-            ->orderBy('pp_last_name', 'asc')
+            // ->orderBy('pp_last_name', 'asc')
             ->get();
         }
 
@@ -386,42 +388,74 @@ class Member extends Model
 
     static function get_specializations($keyword = null, $region = null, $province = null, $city = null, $brgy = null){
 
-        $query = DB::connection('dbskms')->table('tblpersonal_profiles')
-            ->select('*'
-            ,DB::connection('dbskms')->raw('(SELECT region_name FROM tblregions WHERE region_id LIKE adr_region) AS REGION')
-            ,DB::connection('dbskms')->raw('(SELECT province_name FROM tblprovinces WHERE province_id LIKE adr_province) AS PROVINCE')
-            ,DB::connection('dbskms')->raw('(SELECT city_name FROM tblcities WHERE city_id LIKE adr_city) AS CITY')
-            ,DB::connection('dbskms')->raw('(SELECT title_name FROM tbltitles WHERE title_id LIKE pp_title) AS TITLE'))
-            ->join('tblusers', 'usr_id', '=', 'pp_usr_id', 'inner')
-            ->join('tblmembers', 'mem_usr_id', '=', 'usr_id', 'left')
-            ->join('tblmembership_profiles','mpr_usr_id','=','mem_usr_id', 'left')
-            ->join('tblsex','s_id','=','pp_sex', 'left')
-            ->join('tblresidence_address','mpr_usr_id','=','adr_usr_id', 'left')
-            ->where('usr_grp_id', '3')
-            ->where('mem_status', '!=', '3')
-            ->orderBy('pp_last_name', 'asc');
+        $where = '';
 
-            if($keyword != null){
-                $query->where('mpr_gen_specialization', 'LIKE','%'. $keyword .'%');
-            }
+        if($keyword != null){
+            $where .= 'AND mpr_gen_specialization LIKE "%'. $keyword . '%" ';
+            // $query->where('mpr_gen_specialization', 'LIKE','%'. $keyword .'%');
+        }
 
-            if($region != null){
-                $query->where('adr_region', $region);
-            }
-            
-            if($province != null){
-                $query->where('adr_province', $province);
-            }
-            
-            if($city!= null){
-                $query->where('adr_city', $city);
-            }
-            
-            if($brgy != null){
-                $query->where('adr_brgy', 'LIKE', '%' . $brgy . '%');
-            }
+        if($region != null){
+            $where .= 'AND adr_region LIKE "%'. $region . '%" ';
+            // $query->where('adr_region', $region);
+        }
+        
+        if($province != null){
+            $where .= 'AND adr_province LIKE "%'. $province . '%" ';
+            // $query->where('adr_province', $province);
+        }
+        
+        if($city!= null){
+            $where .= 'AND adr_city LIKE "%'. $adr_city . '%" ';
+            // $query->where('adr_city', $adr_city);
+        }
+        
+        if($brgy != null){
+            $where .= 'AND adr_brgy LIKE "%'. $brgy . '%" ';
+            // $query->where('adr_brgy', 'LIKE', '%' . $brgy . '%');
+        }
+        
+        return DB::select('SELECT * '.
+        'FROM ( SELECT new_dbskms.tblpersonal_profiles.*, div_number, mpr_gen_specialization, title_name AS TITLE, region_name AS REGION, province_name AS PROVINCE, city_name AS CITY, sex '.
+        'FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembership_profiles ON mpr_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblresidence_address ON mpr_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'LEFT JOIN new_dbskms.tblprovinces ON province_id = emp_province '.
+        'LEFT JOIN new_dbskms.tblcities ON city_id = emp_city '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'WHERE usr_grp_id like 3  AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country = 175 '. $where .
+        'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '. 
+        'FROM new_dbskms.tblemployments '.
+        'GROUP by emp_usr_id '.
+        'ORDER by emp_id DESC) '.
+        'GROUP BY emp_usr_id '.
+        ') as q');  
 
-            return $query->get();
+        // $query = DB::connection('dbskms')->table('tblpersonal_profiles')
+        //     ->select('*'
+        //     ,DB::connection('dbskms')->raw('(SELECT region_name FROM tblregions WHERE region_id LIKE adr_region) AS REGION')
+        //     ,DB::connection('dbskms')->raw('(SELECT province_name FROM tblprovinces WHERE province_id LIKE adr_province) AS PROVINCE')
+        //     ,DB::connection('dbskms')->raw('(SELECT city_name FROM tblcities WHERE city_id LIKE adr_city) AS CITY')
+        //     ,DB::connection('dbskms')->raw('(SELECT title_name FROM tbltitles WHERE title_id LIKE pp_title) AS TITLE'))
+        //     ->join('tblusers', 'usr_id', '=', 'pp_usr_id', 'inner')
+        //     ->join('tblmembers', 'mem_usr_id', '=', 'usr_id', 'left')
+        //     ->join('tbldivisions', 'div_id', '=', 'mem_div_id')
+        //     ->join('tblmembership_profiles','mpr_usr_id','=','mem_usr_id', 'left')
+        //     ->join('tblsex','s_id','=','pp_sex', 'left')
+        //     ->join('tblresidence_address','mpr_usr_id','=','adr_usr_id', 'left')
+        //     ->where('usr_grp_id', '3')
+        //     ->where('mem_status', '!=', '3')
+        //     ->orderBy('pp_last_name', 'asc');
+
+            
+
+            // return $query->get();
     }
 
     static function get_specific_member($last, $first, $config = null){
@@ -431,6 +465,7 @@ class Member extends Model
         ,DB::connection('dbskms')->raw('(SELECT title_name FROM tbltitles WHERE title_id LIKE pp_title) AS TITLE'))
         ->join('tblusers', 'usr_id', '=', 'pp_usr_id', 'inner')
         ->join('tblmembers', 'mem_usr_id', '=', 'usr_id', 'left')
+        ->join('tbldivisions', 'div_id', '=', 'mem_div_id')
         ->join('tblmembership_profiles','mpr_usr_id','=','mem_usr_id', 'left')
         ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
         ->where('usr_grp_id', '3')
@@ -453,19 +488,29 @@ class Member extends Model
         return $query->get();
     }
     
-
     static function get_all_members(){
 
-        return DB::connection('dbskms')->table('tblpersonal_profiles')
-        ->select('*'
-        ,DB::connection('dbskms')->raw('(SELECT title_name FROM tbltitles WHERE title_id LIKE pp_title) AS TITLE'))
-        ->join('tblusers', 'usr_id', '=', 'pp_usr_id', 'inner')
-        ->join('tblmembers', 'mem_usr_id', '=', 'usr_id', 'left')
-        ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
-        ->where('usr_grp_id', '3')
-        ->where('mem_status', '!=', '3')
-        ->orderBy('pp_last_name', 'asc')
-        ->get();
+        return DB::select('SELECT * '.
+        'FROM ( SELECT new_dbskms.tblpersonal_profiles.*, div_number, title_name AS TITLE, region_name AS REGION, province_name AS PROVINCE, city_name AS CITY, sex '.
+        'FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembership_profiles ON mpr_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblresidence_address ON mpr_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'LEFT JOIN new_dbskms.tblprovinces ON province_id = emp_province '.
+        'LEFT JOIN new_dbskms.tblcities ON city_id = emp_city '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'WHERE usr_grp_id like 3  AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country = 175 '. $where .
+        'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '. 
+        'FROM new_dbskms.tblemployments '.
+        'GROUP by emp_usr_id '.
+        'ORDER by emp_id DESC) '.
+        'GROUP BY emp_usr_id '.
+        ') as q');  
     }
 
     static function get_all_members_per_loc($last = null, $first = null, $region = null, $province = null, $city = null, $brgy = null, $config = null){
@@ -478,6 +523,7 @@ class Member extends Model
             ,DB::connection('dbskms')->raw('(select title_name from tbltitles where title_id like pp_title) as TITLE'))
             ->join('tblusers', 'usr_id', '=', 'pp_usr_id', 'inner')
             ->join('tblmembers', 'mem_usr_id', '=', 'usr_id', 'left')
+            ->join('tbldivisions', 'div_id', '=', 'mem_div_id')
             ->join('tblmembership_profiles','mpr_usr_id','=','mem_usr_id', 'left')
             ->join('tblsex', 's_id', '=', 'pp_sex', 'left')
             ->join('tblresidence_address','mpr_usr_id','=','adr_usr_id', 'left')
@@ -2938,9 +2984,10 @@ class Member extends Model
 
             if($req->memis_country == '999' ){ 
 
-                   
-                $where .= ' AND emp_country > 0 ';
-                $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = usr_id)';  
+                $where .= 'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '.
+                'FROM new_dbskms.tblemployments '.
+                'GROUP by emp_usr_id '.
+                'ORDER by emp_id DESC)';
 
                 if($req->memis_region > 0 && $req->memis_region != '999'){
        
@@ -2958,7 +3005,6 @@ class Member extends Model
 
                 }
 
-                
                 if($req->memis_sex > 0){ // sex
 
                     if($req->memis_sex > 0 && $req->memis_sex != '999'){
@@ -3034,14 +3080,15 @@ class Member extends Model
                 }
 
                 $group_by .= ' GROUP BY pp_usr_id ';
-                $join .= ' JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id ';
-                $join .= ' LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id ';
-                $join .= ' JOIN new_dbskms.tblcountries on country_id = emp_country ';
                                 
                 $sub_q .= 'SELECT country_id, count(mem_usr_id) as total, country_name AS label '. $field .
-                'FROM new_dbskms.tblmembers '. 
-                'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
-                'WHERE usr_grp_id LIKE 3 '. $where . $deceased . $group_by . $having;
+                'FROM new_dbskms.tblpersonal_profiles '. 
+                'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+                'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+                'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+                'LEFT JOIN new_dbskms.tblcountries on country_id = emp_country '.
+                'WHERE usr_grp_id LIKE 3 AND mem_status IS NOT NULL AND emp_country > 0 '. 
+                $where . $deceased . $group_by . $having;
 
                 $select .= 'SELECT count(total) as total, label, country_id as bar_id FROM '. 
                 '( ' . $sub_q . ') as tmp GROUP BY country_id';
@@ -4038,6 +4085,20 @@ class Member extends Model
             }
         }
 
+        if($req->radio_default == 'memis_country'){ // country default
+
+            if($req->memis_sex == '999'){
+
+                $query = DB::connection('dbskms')->table('tblsex')
+                ->select('s_id','sex')
+                ->get();
+                
+                foreach($query as $row){  
+                    $result_array[] = array($row->s_id => array($row->sex => Member::get_all_country($row->s_id, $req)));
+                }
+            }
+        }
+
         return $result_array;
     }
 
@@ -4396,11 +4457,13 @@ class Member extends Model
         $sub_q = '';
 
         $group_by .= ' GROUP BY pp_usr_id ';
-        $join .= ' JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id ';
-        $join .= ' LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id ';
-        $join .= ' JOIN new_dbskms.tblregions ON region_id = emp_region ';
 
-        $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = usr_id) '; 
+        // $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = usr_id) '; 
+        
+        $where .= 'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '.
+        'FROM new_dbskms.tblemployments '.
+        'GROUP by emp_usr_id '.
+        'ORDER by emp_id DESC)';
 
         if($req->memis_division > 0){
             
@@ -4483,13 +4546,61 @@ class Member extends Model
             $having .= ' '.$key. ' year BETWEEN '. $req->memis_start_year .' AND '. $req->memis_end_year .' '; 
         }
                         
+
         $sub_q .= 'SELECT region_id, count(mem_usr_id) as total '. $field .
-        'FROM new_dbskms.tblmembers '. 
-        'INNER JOIN new_dbskms.tblusers ON usr_id = mem_usr_id '. $join .
-        'WHERE usr_grp_id LIKE 3 '. $where . $deceased . $group_by . $having;
+        'FROM new_dbskms.tblpersonal_profiles '. 
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'WHERE usr_grp_id like 3  AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country = 175 '.
+        $where . $deceased . $group_by . $having;
 
         $select .= 'SELECT count(total) as total FROM '. 
         '( ' . $sub_q . ') as tmp GROUP BY region_id';
+
+        return DB::select($select);
+
+    }
+
+    // all country for stack
+    public static function get_all_country($id, $req){
+
+        $select = '';
+        $where = '';
+        $join = '';
+        $group_by = '';
+        $order_by = '';
+        $having = '';
+        $deceased = ' AND mem_status != 3 ';
+        $key = '';
+        $field = '';
+        $sub_q = '';
+
+        $group_by .= ' GROUP BY pp_usr_id ';
+        
+        $where .= 'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '.
+        'FROM new_dbskms.tblemployments '.
+        'GROUP by emp_usr_id '.
+        'ORDER by emp_id DESC)';
+
+        if($req->memis_sex > 0){ // sex
+
+            $where .= ' AND pp_sex LIKE '. $id;
+
+        }
+                        
+        $sub_q .= 'SELECT country_id, count(mem_usr_id) as total, country_name '. $field .
+        'FROM new_dbskms.tblpersonal_profiles '. 
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments as pp ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '.
+        'JOIN new_dbskms.tblcountries on country_id = emp_country '.
+        'WHERE usr_grp_id LIKE 3 AND mem_status IS NOT NULL AND emp_country > 0 '. 
+        $where . $deceased . $group_by . $having;
+
+        $select .= 'SELECT count(total) as total, country_name FROM '. 
+        '( ' . $sub_q . ') as tmp GROUP BY country_id';
 
         return DB::select($select);
 
@@ -6753,37 +6864,144 @@ class Member extends Model
                
     }
 
-    static function get_csf(){
+    static function get_csf($id){
         
-        
-        $result_array = array();
+        if($id == 1){ // stacked bar category
 
-        $query = DB::connection('dbskms')->table('tblservice_feedback_ratings')
-        ->select('svc_fdbk_rating_id','svc_fdbk_rating')
-        ->orderBy('svc_fdbk_rating_id','asc')
-        ->get();
-        
-        foreach($query as $row){  
-            $result_array[] = array($row->svc_fdbk_rating_id => array($row->svc_fdbk_rating => Member::get_all_csf($row->svc_fdbk_rating_id)));
-        }
+            $result_array = array();
 
-        return $result_array;
+            $query = DB::connection('dbskms')->table('tblservice_feedback_ratings')
+            ->select('svc_fdbk_rating_id','svc_fdbk_rating')
+            ->where('svc_fdbk_rating', '!=', 'Yes')
+            ->where('svc_fdbk_rating', '!=', 'No')
+            ->orderBy('svc_fdbk_rating_id','asc')
+            ->get();
+            
+            foreach($query as $row){  
+                $result_array[] = array($row->svc_fdbk_rating_id => array($row->svc_fdbk_rating => Member::get_all_csf($row->svc_fdbk_rating_id)));
+            }
+
+            
+            return $result_array;
+
+        }else if($id == 2){ // pie sex 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            $where .= ' AND pp_sex > 0 ';
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY pp_usr_id ';
+            $join .= ' JOIN new_dbskms.tblsex on s_id = pp_sex ';
+                            
+            $sub_q .= 'SELECT s_id, count(pp_usr_id) as total, sex AS label '. 
+            'FROM new_dbskms.tblpersonal_profiles '. 
+            'JOIN new_dbskms.tblservice_feedbacks ON svc_fdbk_usr_id = pp_usr_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = new_dbskms.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY s_id ORDER BY s_id desc';
+
+            return DB::select($select);
+
+        }else if($id == 3){ // bar region 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = pp_usr_id) '; 
+            // $where .= ' AND emp_period_to = "Present" '; 
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY pp_usr_id ';
+ 
+            $join .= 'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = pp_usr_id ';
+            $join .= 'JOIN new_dbskms.tblregions on region_id = emp_region ';
+
+            $sub_q .= 'SELECT count(pp_usr_id) as total, region_name as label, region_id '.
+            'FROM new_dbskms.tblpersonal_profiles '. 
+            'JOIN new_dbskms.tblservice_feedbacks ON svc_fdbk_usr_id = pp_usr_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = new_dbskms.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY region_id';
+
+            return DB::select($select);
+
+        }else if($id == 4){ // bar age 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY pp_usr_id ';
+
+            $sub_q .= 'SELECT count(pp_usr_id) AS total, '.
+            'CASE  '.
+            'WHEN YEAR(CURDATE()) - YEAR(pp_date_of_birth) BETWEEN 20 AND 31 then "1" '.
+            'WHEN YEAR(CURDATE()) - YEAR(pp_date_of_birth) BETWEEN 30 AND 41 then "2" '.
+            'WHEN YEAR(CURDATE()) - YEAR(pp_date_of_birth) BETWEEN 40 AND 51 then "3" '.
+            'WHEN YEAR(CURDATE()) - YEAR(pp_date_of_birth) BETWEEN 50 AND 61 then "4" '.
+            'WHEN YEAR(CURDATE()) - YEAR(pp_date_of_birth) BETWEEN 60 AND 71 then "5" '.
+            'ELSE "6" END AS "range" '. 
+            'FROM new_dbskms.tblpersonal_profiles '.
+            'JOIN new_dbskms.tblservice_feedbacks ON svc_fdbk_usr_id = pp_usr_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = new_dbskms.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            'WHERE pp_date_of_birth LIKE \'%-%\' '. 
+            'AND pp_date_of_birth > 0 '. $where . $group_by;
+
+            $select .= 'SELECT count(total) AS total, '. 
+            '(SELECT age_range FROM new_dbskms.tblage_ranges WHERE age_id = tmp.range) AS label FROM '. 
+            '( ' . $sub_q . ') AS tmp GROUP BY tmp.range';
+
+            return DB::select($select);
+
+        }else{ // bar affiliation 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            // $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = pp_usr_id) '; 
+            // $where .= ' AND emp_period_to = "Present" '; 
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            $where .= ' AND svc_id LIKE 3 ';
+            $where .= ' AND svc_fdbk_q_order LIKE 1 ';
+            $group_by .= ' GROUP BY pp_usr_id ';
+ 
+            $join .= 'JOIN new_dbskms.tblaffiliation_type ON aff_type_id = svc_fdbk_q_answer ';
+            // $join .= 'JOIN new_dbskms.tblregions on region_id = emp_region ';
+
+            $sub_q .= 'SELECT count(pp_usr_id) as total, aff_type as label, aff_type_id '.
+            'FROM new_dbskms.tblpersonal_profiles '. 
+            'JOIN new_dbskms.tblservice_feedbacks ON svc_fdbk_usr_id = pp_usr_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = new_dbskms.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label, aff_type_id FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY aff_type_id';
+
+            return DB::select($select);
+
+        } 
+
+        
+        // 'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
+
         
     }
 
     // all csf for graph
-    public static function get_all_csf($id){
+    static function get_all_csf($id){
 
-    
         $query = DB::select('SELECT svc_fdbk_q_id, svc_fdbk_q, '. 
-        '(SELECT COUNT(*) FROM new_dbskms.tblservice_feedbacks '. 
+        '(SELECT COUNT(*) FROM new_dbskms.tblservice_feedbacks '.
         'WHERE new_dbskms.tblservice_feedbacks.svc_fdbk_q_id '. 
         'LIKE new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id '. 
-        'AND svc_fdbk_q_answer LIKE '. $id . ' '. 
+        'AND svc_fdbk_q_answer LIKE '. $id . ' AND svc_id LIKE 3'. 
         ') AS total '. 
         'FROM new_dbskms.tblservice_feedback_questions '. 
-        'WHERE svc_fdbk_q_choices LIKE "1,2,3,4,5"');
-  
+        'WHERE svc_fdbk_q_choices LIKE "1,2,3,4,5" AND svc_fdbk_q_code LIKE "CSF-V2022" ');
 
         return $query;
 
@@ -6793,28 +7011,98 @@ class Member extends Model
         
         return DB::connection('dbskms')->table('tblservice_feedbacks')
         ->join('tblpersonal_profiles','pp_usr_id','=','svc_fdbk_usr_id')
-        ->join('tblsex','s_id','=','pp_sex')
-        ->select('pp_last_name', 'pp_first_name', 'pp_email', 'sex', 'tblservice_feedbacks.*')
+        ->join('tblservice_feedback_questions','tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->join('tblemployments','emp_usr_id','=','pp_usr_id')
+        ->join('tblregions','region_id','=','emp_region', 'left')
+        ->join('tblsex','s_id','=','pp_sex','left')
+        ->join('tblmembership_profiles','mpr_usr_id','=','pp_usr_id')
+        ->join('tbldivisions','div_id','=','mpr_div_id','left')
+        ->select('div_number', 'pp_usr_id', 'pp_last_name', 'pp_first_name', 'pp_email', 'sex', 'region_name', 'emp_pos', 'emp_ins', 'tblservice_feedbacks.date_created as date_created', 
+        DB::connection('dbskms')->raw('YEAR(CURDATE())-YEAR(pp_date_of_birth) AS age'))
+        ->where('svc_id','3')
+        ->whereRaw('emp_id in (SELECT MAX(emp_id) AS emp_id FROM new_dbskms.tblemployments GROUP by emp_usr_id ORDER by emp_id DESC)')
+        // ->where('svc_fdbk_q_choices', '1,2,3,4,5')
+        ->where('svc_fdbk_q_code', 'CSF-V2022')
         ->orderBy('pp_last_name')
         ->groupBy('svc_fdbk_usr_id')
         ->get();
     }
 
-    // get qcsf uestions
-    static function get_questions(){
-        return DB::connection('dbskms')->table('tblservice_feedback_questions')
-        ->select('svc_fdbk_q')
-        ->where('svc_fdbk_q_choices', '1,2,3,4,5')
+    static function get_csf_answers($user_id){
+        return DB::connection('dbskms')->table('tblservice_feedbacks')
+        ->join('new_dbskms.tblservice_feedback_questions','new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->where('new_dbskms.tblservice_feedback_questions.svc_fdbk_q_code', 'CSF-V2022')
+        ->where('svc_fdbk_usr_id', $user_id)
+        ->where('svc_id','3')
+        // ->groupBy('tbl_csf_respondents.fb_id')
         ->get();
+    }
+
+    // get csf desc
+    static function get_csf_desc($id, $user){
+        return DB::connection('dbskms')->table('tblservice_feedbacks')
+        ->join('tblservice_feedback_questions','tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->join('tblpersonal_profiles','pp_usr_id','=','tblservice_feedbacks.svc_fdbk_usr_id')
+        ->select('tblservice_feedbacks.svc_fdbk_q_answer as rate')
+        ->where('svc_fdbk_q_order', $id)
+        ->where('svc_fdbk_q_code', 'CSF-V2022')
+        ->where('svc_fdbk_usr_id', $user)
+        ->get();
+    }
+
+    // get qcsf questions
+    static function get_questions(){
+        
+        return DB::connection('dbskms')->table('tblservice_feedback_questions')
+        ->select('svc_fdbk_q_desc')
+        ->where('svc_fdbk_q_choices', '1,2,3,4,5')
+        ->where('svc_fdbk_q_code', 'CSF-V2022')
+        ->get();
+
+        // return DB::connection('dbskms')->table('tblservice_feedback_questions')
+        // ->select('svc_fdbk_q')
+        // ->where('svc_fdbk_q_choices', '1,2,3,4,5')
+        // ->where('svc_fdbk_q_code', 'CSF-V2022')
+        // ->get();
     } 
+
+    // get discrepanices (no employment, no region, no status, no counrtry)
+    public static function get_no_employment(){
+
+        // SELECT emp_id, emp_usr_id, emp_ins, emp_country, region_name FROM tblemployments
+        // inner join tblusers on usr_id = emp_usr_id
+        // left join tblpersonal_profiles on pp_usr_id = emp_usr_id
+        // left join tblmembers on mem_usr_id = emp_usr_id
+        // left join tblregions on region_id = emp_region
+        // WHERE usr_grp_id = 3 and mem_status != 3 and mem_status is not null and emp_country = 175 and (emp_region = 0 OR emp_region is null) and emp_id IN 
+        // (SELECT max(emp_id) as emp_id
+        // FROM tblemployments 
+        // GROUP by emp_usr_id 
+        // ORDER by emp_id DESC);
+
+        return DB::select('SELECT * FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id  '.
+        'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = pp_usr_id  '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id  '.
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'WHERE emp_usr_id IS NULL AND usr_grp_id = 3 AND mem_status != 3');
+    
+    }
 
     public static function get_no_region(){
 
-        $query = DB::select(' SELECT * FROM new_dbskms.tblemployments '.
-        'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '. 
-        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
-        'WHERE emp_country = 175 '. 
-        'AND emp_region = 0 '. 
+        $query = DB::select(' SELECT * FROM new_dbskms.tblusers '.
+        'INNER JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
+        ' JOIN new_dbskms.tblemployments ON emp_usr_id = usr_id '. 
+        ' JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id '.
+        ' JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        ' JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        ' JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        ' WHERE emp_country = 175 '. 
+        'AND emp_id = (SELECT MAX(emp_id) FROM new_dbskms.tblemployments where emp_usr_id = usr_id ) '.
+        'AND (emp_region = 0 OR emp_region IS NULL OR emp_region = "") '. 
         'AND usr_grp_id LIKE 3 '. 
         'AND mem_status != 3 '.
         'GROUP BY emp_usr_id');
@@ -6824,159 +7112,72 @@ class Member extends Model
 
     public static function get_no_status(){
 
-        // select * from `tblpersonal_profiles` inner join `tblusers` on `usr_id` = `pp_usr_id` left join `tblmembers` on `mem_usr_id` = `pp_usr_id` where `usr_grp_id` = 3 and `mem_status` is null
+        // SELECT emp_id, emp_usr_id, emp_ins, emp_country, region_name FROM tblemployments
+        // inner join tblusers on usr_id = emp_usr_id
+        // left join tblpersonal_profiles on pp_usr_id = emp_usr_id
+        // left join tblmembers on mem_usr_id = emp_usr_id
+        // left join tblregions on region_id = emp_region
+        // WHERE usr_grp_id = 3 and mem_status is null and emp_id IN 
+        // (SELECT max(emp_id) as emp_id
+        // FROM tblemployments 
+        // GROUP by emp_usr_id 
+        // ORDER by emp_id DESC);
 
-        $query = DB::select(' SELECT * FROM new_dbskms.tblpersonal_profiles '.
-        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '. 
+        return DB::select('SELECT * FROM new_dbskms.tblemployments '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '. 
+        'LEFT JOIN new_dbskms.tblpersonal_profiles on pp_usr_id = emp_usr_id '.
         'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = pp_usr_id '. 
-        'WHERE usr_grp_id LIKE 3 '. 
-        'AND mem_status is null ');
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'WHERE usr_grp_id = 3 and mem_status IS NULL AND mem_status != 3');
+    }
 
-        return $query;
+    public static function get_no_country(){
+
+        return DB::select('SELECT * FROM new_dbskms.tblpersonal_profiles '.
+        'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = pp_usr_id '.
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = emp_usr_id '.
+        'LEFT JOIN new_dbskms.tblregions ON region_id = emp_region '.
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'WHERE usr_grp_id = 3 AND mem_status != 3 AND mem_status IS NOT NULL AND (emp_country = 0 OR emp_country IS NULL) AND emp_id IN  '.
+        '(SELECT MAX(emp_id) AS emp_id '.
+        'FROM new_dbskms.tblemployments  '.
+        'GROUP by emp_usr_id  '.
+        'ORDER by emp_id DESC)');
     }
 
     public static function get_abroad(){
 
-        $query = DB::select(' SELECT * FROM new_dbskms.tblemployments '.
+        // SELECT emp_id, emp_usr_id, region_name FROM tblpersonal_profiles
+        //     inner join tblusers on usr_id = pp_usr_id
+        //     left join tblemployments on emp_usr_id = pp_usr_id
+        //     left join tblmembers on mem_usr_id = emp_usr_id
+        //     left join tblregions on region_id = emp_region
+        //     WHERE usr_grp_id = 3 and mem_status != 3 and mem_status is not null and emp_country != 175 and emp_country > 0 and emp_country is not null and emp_id IN 
+        //     (SELECT max(emp_id) as emp_id
+        //     FROM tblemployments 
+        //     GROUP by emp_usr_id 
+        //     ORDER by emp_id DESC);
+        //tama na
+
+        return DB::select(' SELECT * FROM new_dbskms.tblemployments '.
         'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '. 
-        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
-        'WHERE emp_country != 175 '. 
-        'AND emp_country != 0 '. 
-        'AND usr_grp_id LIKE 3 '. 
-        'AND mem_status != 3 '.
-        'GROUP BY emp_usr_id');
-
-        return $query;
+        'LEFT JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = emp_usr_id '. 
+        'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = emp_usr_id '. 
+        'LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex '.
+        'LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id '.
+        'LEFT JOIN new_dbskms.tbltitles ON title_id = pp_title '.
+        'LEFT JOIN new_dbskms.tblcountries ON country_id = emp_country '.
+        'WHERE usr_grp_id = 3 AND mem_status != 3 AND mem_status IS NOT NULL AND emp_country != 175 AND emp_country > 0 AND emp_country is not null '. 
+        'AND emp_id IN (SELECT MAX(emp_id) AS emp_id '.
+        'FROM new_dbskms.tblemployments '. 
+        'GROUP by emp_usr_id '. 
+        'ORDER by emp_id DESC)');
     }
-    
-    // all country later
-    // public static function get_all_country($id, $req){
-
-    //     $join = '';
-    //     $where = '';
-    //     $deceased = ' AND mem_status != 3 ';
-    //     $select = '';
-    //     $having = '';
-
-
-    //     if($req->memis_division == '999'){
-
-    //         $join .= ' LEFT JOIN new_dbskms.tbldivisions ON div_id = mem_div_id ';
-    //         // $where .= ' AND div_id like '. $id;
-    //     }else if($req->memis_sex == '999'){
-
-    //         $join .= ' LEFT JOIN new_dbskms.tblpersonal_profiles ON pp_usr_id = usr_id ';
-    //         $join .= ' LEFT JOIN new_dbskms.tblsex ON s_id = pp_sex ';
-    //         $where .= ' AND pp_sex like '. $id;
-            
-    //     }else if($req->memis_category == '999'){
-
-    //             $join .= ' LEFT JOIN new_dbskms.tblmembership_types ON membership_type_id = mem_type ';
-    //             $where .= ' AND mem_type like '. $id;
-            
-    //     }else if($req->memis_status == '999'){
-
-    //             $join .= ' LEFT JOIN new_dbskms.tblmembership_status ON membership_status_id = mem_status ';
-    //             $where .= ' AND mem_status like '. $id;
-    //             $deceased = '';
-    //     }else if($req->memis_educ == '999'){
-                
-    //             $join .= ' LEFT JOIN new_dbskms.tblacademic_degree_profiles ON adp_usr_id = usr_id ';
-    //             $join .= ' LEFT JOIN new_dbskms.tbldegree_types ON deg_id = adp_highest ';
-    //             $select .= ' ,CASE WHEN MAX(adp_highest) = 1 THEN "Doctor of Philosopy (PhD)" '.
-    //             'WHEN MAX(adp_highest) = 2 THEN "Master of Degree (MS)" '. 
-    //             'WHEN MAX(adp_highest) = 3 THEN "Bachelor of Science (BS)" END ';
-    //             $where .= ' AND adp_highest like '. $id;
-    //     }
-
-    //     $query = DB::select('SELECT country_id, country_name, COUNT(emp_usr_id) as total '.
-    //         'FROM ( (SELECT emp_usr_id, country_id, country_name, '.
-    //         'COUNT(case when emp_period_to = "Present" then emp_period_to end) as PRESENT '. $select .
-    //         'FROM new_dbskms.tblemployments '.
-    //         'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-    //         'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-    //         ' JOIN new_dbskms.tblcountries ON country_id = emp_country '. $join .
-    //         'WHERE usr_grp_id like 3 '. $deceased . $where .
-    //         ' GROUP BY emp_usr_id having PRESENT > 0) '.
-    //         'UNION ALL '.
-    //         '(SELECT emp_usr_id, country_id, country_name, '.
-    //         'COUNT(CASE WHEN emp_period_to = "Present" THEN emp_period_to END) as PRESENT '. $select .
-    //         'FROM new_dbskms.tblemployments '.
-    //         'INNER JOIN new_dbskms.tblusers ON usr_id = emp_usr_id '.
-    //         'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '.
-    //         ' JOIN new_dbskms.tblcountries ON country_id = emp_country '. $join .
-    //         'WHERE usr_grp_id like 3 '. $deceased . $where .
-    //         ' GROUP BY emp_usr_id having PRESENT = 0) '.
-    //         ') as q '.
-    //         'GROUP BY country_id');
-       
-
-    //     return $query;
-    // } 
-
-
-    
-
-        // if($req->radio_default == 'memis_country'){ // country default todo later
-
-        //     if($req->memis_division == '999'){
-
-        //         $query = DB::connection('dbskms')->table('tbldivisions')
-        //         ->select('div_id','div_name')
-        //         ->get();
-                
-        //         foreach($query as $row){  
-        //             $result_array[] = array($row->div_id => array($row->div_name => Member::get_all_country($row->div_id, $req)));
-        //         }
-        //     }else if($req->memis_sex == '999'){
-
-        //         $query = DB::connection('dbskms')->table('tblsex')
-        //         ->select('s_id','sex')
-        //         ->get();
-                
-        //         foreach($query as $row){  
-        //             $result_array[] = array($row->s_id => array($row->sex => Member::get_all_country($row->s_id, $req)));
-        //         }
-        //     }else if($req->memis_category == '999'){
-
-        //         $query = DB::connection('dbskms')->table('tblmembership_types')
-        //         ->select('membership_type_id','membership_type_name')
-        //         ->get();
-                
-        //         foreach($query as $row){  
-        //             $result_array[] = array($row->membership_type_id => array($row->membership_type_name => Member::get_all_country($row->membership_type_id, $req)));
-        //         }
-        //     }else if($req->memis_status == '999'){
-
-        //         $query = DB::connection('dbskms')->table('tblmembership_status')
-        //         ->select('membership_status_id','membership_status_name')
-        //         ->get();
-                
-        //         foreach($query as $row){  
-        //             $result_array[] = array($row->membership_status_id => array($row->membership_status_name => Member::get_all_country($row->membership_status_id, $req)));
-        //         }
-        //     }else if($req->memis_educ == '999'){
-
-        //         $query = DB::connection('dbskms')->table('tbldegree_types')
-        //         ->select('deg_id','deg_name')
-        //         ->get();
-                
-        //         foreach($query as $row){  
-        //             $result_array[] = array($row->deg_id => array($row->deg_name => Member::get_all_country($row->deg_id, $req)));
-        //         }
-        //     }
-        //     // else if($req->memis_age == '999'){ to be continue
-
-        //     //     $query = DB::connection('dbskms')->table('tblage_ranges')
-        //     //     ->select('age_id','age_range')
-        //     //     ->get();///continue
-                
-        //     //     foreach($query as $row){  
-        //     //         $result_array[] = array($row->age_id => array($row->age_range => Member::get_all($row->age_id, $req)));
-        //     //     }
-        //     // }
-
-        // }
 
     public static function get_line_division($id, $req){
 

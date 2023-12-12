@@ -16,7 +16,6 @@
                             @php $checked = (Cookie::get('remember') == 1) ? 'checked' : '' @endphp
                             @php $email = (Cookie::get('email') !== null) ? Cookie::get('email') : old('email')  @endphp
                             @php $pass = (Cookie::get('password') !== null) ? Cookie::get('password') : old('password')  @endphp
-                                <h5>Login</h5>
                                 <div class="form-group mt-3">    
                                     <input type="email" class="form-control form-control-lg @error('email') is-invalid @enderror"
                                            id="email" 
@@ -59,7 +58,7 @@
                                     <label class="form-check-label">Remember me</label>
                                 </div>
 
-                                <button type="submit" class="btn btn-dark w-25">Login</button>
+                                <button type="submit" class="btn btn-dark btn-lg w-100 font-weight-bold">Log In</button>
 
                                 @if ($message = $errors->first('error'))
                                 <div class="text-danger pt-2">
@@ -70,14 +69,20 @@
                         
 
                             </form>
-                            <div class="pt-3">
+                            <div class="mt-3">
                                 <a href="forgot/password">
-                                    <small class="font-weight-bold">Forgout password?</small>
+                                    <small class="font-weight-bold">Forgot password?</small>
                                 </a>
                             </div>
                         </div>
                         <div class="col-5 p-5" style="background-color:white;opacity:.9;min-height:350px">
-                            <hr class="mt-5">
+                        
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="{{URL::asset('storage/images/logos/nrcp.png')}}" class="mt-2" height="30%" width="30%">
+                                <img src="{{URL::asset('storage/images/logos/skms.png')}}" class=" " height="50%" width="50%">
+                                <img src="{{URL::asset('storage/images/logos/execom.png')}}" class=" " height="30%" width="30%">
+                            </div>
+                            <hr>
                             <h1>ExeCom IS</h1>
                             <h6>Provide the management with quick view of data or information that surround the core functions of NRCP.</h6>
                             <hr>

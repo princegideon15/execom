@@ -7,12 +7,19 @@ use App\Logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Auth;
+use Browser;
 
 /**
  * Manages feedbacks of ExeCom IS users
  */
 class FeedbackController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     private $table = 'tblfeedbacks';
     private $ipaddress;
 
@@ -81,10 +88,16 @@ class FeedbackController extends Controller
 
         }
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::user()->user_id, 
         'log_email' => Auth::user()->email, 
         'log_description' => 'Submit Feedback', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
 
         Logs::create($logs);
@@ -101,6 +114,17 @@ class FeedbackController extends Controller
     public function show(Feedback $feedback)
     {
         return Feedback::get_ratings();
+    }
+
+    /**
+     * Get Customer service feedback
+     *
+     * @return void
+     */
+    public function get_overall_csf_graph($id){
+        
+        $csf = Feedback::get_overall_csf_graph($id);
+        return $csf;
     }
 
     /**

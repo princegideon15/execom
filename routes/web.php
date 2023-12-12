@@ -63,8 +63,8 @@ Route::get('/memis/basic/per_reg', 'MemisController@basic_per_reg');
 Route::get('/memis/basic/per_cat', 'MemisController@basic_per_cat');
 Route::get('/memis/basic/per_stat', 'MemisController@basic_per_stat');
 Route::get('/memis/basic/per_sex', 'MemisController@basic_per_sex');
-Route::get('/memis/basic/csf', 'MemisController@get_csf');
-Route::get('/get_disc', 'MemisController@get_discrepancies');
+Route::get('/get_disc', 'MemisController@get_discrepancies'); 
+Route::get('/get_disc_mem', 'MemisController@get_disc_mem'); 
 
 
 // bris basic graph
@@ -87,6 +87,7 @@ Route::get('/ej/va', 'EjournalController@viewed_articles');
 Route::get('/ej/da', 'EjournalController@downloaded_articles');
 Route::get('/ej/mst', 'EjournalController@searched_topics');
 Route::get('/ej/mtc', 'EjournalController@most_clients');
+Route::get('/ej/cte', 'EjournalController@most_citees');
 Route::get('/ej/vo', 'EjournalController@visitors_origin');
 
 // lms
@@ -129,8 +130,54 @@ Route::post('/memis/awa', 'MemisController@get_awards');
 Route::post('/memis/gb', 'MemisController@get_gb');
 Route::post('/memis/pp', 'MemisController@get_province');
 Route::get('/memis_divs', 'MemisController@get_all_division');
+
+// thesis and disertation
+Route::get('/thds/cat/{id}', 'ThdsController@get_thds');
+Route::get('/thds/action/{id}', 'ThdsController@get_action_thds');
+
+// rdlip
+Route::get('/rdlip/grant/{id}', 'GrantController@get_grant');
+
+// memis csf and graphs
 Route::get('/csf_quest', 'MemisController@get_questions');
-Route::get('/csf_list', 'MemisController@get_csf_list');
+Route::get('/csf_list_memis', 'MemisController@get_csf_list');
+Route::get('/csf_memis_desc/{id}/{user}', 'MemisController@get_csf_desc');
+Route::get('/csf_memis_answers/{user}', 'MemisController@get_csf_answers');
+Route::get('/memis/basic/csf/{chart}', 'MemisController@get_csf');
+
+// bris csf and graphs
+Route::get('/csf_list_bris', 'BrisController@get_csf_list');
+Route::get('/csf_bris_desc/{id}/{user}', 'BrisController@get_csf_desc');
+Route::get('/csf_bris_answers/{user}', 'BrisController@get_csf_answers');
+Route::get('/bris/basic/csf/{chart}', 'BrisController@get_csf');
+
+// ej csf and graphs
+Route::get('/csf_list_ej', 'EjournalController@get_csf_list');
+Route::get('/csf_ej_desc/{id}/{user}', 'EjournalController@get_csf_desc');
+Route::get('/csf_ej_answers/{user}', 'EjournalController@get_csf_answers');
+Route::get('/ej/basic/csf/{chart}', 'EjournalController@get_csf');
+
+// lms csf and graphs
+Route::get('/csf_list_lms', 'LmsController@get_csf_list');
+Route::get('/csf_lms_desc/{id}/{user}', 'LmsController@get_csf_desc');
+Route::get('/csf_lms_answers/{user}', 'LmsController@get_csf_answers');
+Route::get('/lms/basic/csf/{chart}', 'LmsController@get_csf');
+
+// lms csf and graphs
+Route::get('/csf_list_thds', 'ThdsController@get_csf_list');
+Route::get('/csf_thds_desc/{id}/{user}', 'ThdsController@get_csf_desc');
+Route::get('/csf_thds_answers/{user}', 'ThdsController@get_csf_answers');
+Route::get('/thds/basic/csf/{chart}', 'ThdsController@get_csf');
+
+// rdlip csf and graphs
+Route::get('/csf_list_rdlip', 'GrantController@get_csf_list');
+Route::get('/csf_rdlip_desc/{id}/{user}', 'GrantController@get_csf_desc');
+Route::get('/csf_rdlip_answers/{user}', 'GrantController@get_csf_answers');
+Route::get('/rdlip/basic/csf/{chart}', 'GrantController@get_csf');
+
+// overall csf graph
+Route::get('/skms/csf/{chart}', 'FeedbackController@get_overall_csf_graph');
+
 
 // memis graph
 Route::post('/memis/bar_graph', 'MemisController@do_bar_graph');
@@ -145,13 +192,15 @@ Route::post('/memis/line_graph', 'MemisController@do_line_graph');
 // memis graph specific
 Route::post('/memis/bar_graph_by_id', 'MemisController@do_bar_graph_by_id');
 
-
 // nrcpnet
 Route::post('/nrcpnet/plant', 'NrcpnetController@get_plant');
 Route::post('/nrcpnet/cont', 'NrcpnetController@get_cont');
 Route::post('/nrcpnet/jo', 'NrcpnetController@get_jo');
 Route::post('/nrcpnet/vac', 'NrcpnetController@get_vac');
 Route::get('/nrcpnet/divs', 'NrcpnetController@get_divs');
+
+// skms
+Route::get('/csf_list_skms', 'HomeController@get_csf_list');
 
 // search
 Route::post('/search', 'SearchController@search');
@@ -172,6 +221,9 @@ Route::get('/search/divs',  'SearchController@get_divisions');
 // users
 Route::get('/skms_users', 'MemisController@get_users');
 Route::get('/execom_users', 'HomeController@get_users');
+Route::get('/execom/get/{id}','HomeController@get_users');
+Route::post('/execom/edit', 'HomeController@edit_user');
+Route::post('/execom/update', 'HomeController@update_user');
 Route::post('/execom/add', 'HomeController@add_user');
 Route::post('/execom/remove', 'HomeController@remove_user');
 Route::post('/execom/create', 'HomeController@create_user');
@@ -187,7 +239,30 @@ Route::post('/update_feedbacks', 'FeedbackController@update');
 // backup and import
 Route::post('/backup/export', 'BackupController@export');
 Route::post('/backup/import', 'BackupController@import');
+Route::get('/backup/export_logs', 'BackupController@export_logs');
+Route::get('/backup/clear_with_export_logs', 'BackupController@clear_with_export_logs');
+
+// save logs
+Route::post('/save_logs', 'HomeController@save_logs');
 
 
 
 
+
+
+
+
+
+
+// tests
+
+Route::get('/send-mail2','HomeController@send_email_test');
+
+Route::get('/send-mail', function () {
+
+    $email_data = [ 'name' => 'Gerard Balde',
+        'email' => 'test@mail.com', 
+        'password' => 'test pass'];
+
+    return new \App\Mail\AccountCreated($email_data);
+});

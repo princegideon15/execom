@@ -20,4 +20,6 @@ class Logs extends Model
     ];
 
     
+
+    
 }

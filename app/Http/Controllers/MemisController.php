@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Member;
 use App\Logs;
 use Auth;
+use Browser;
 
 include(app_path() . '\Colors\RandomColor.php'); // local
 // include(app_path() . '/Colors/RandomColor.php'); // server
@@ -72,9 +73,15 @@ class MemisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Members Per Division", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -109,9 +116,15 @@ class MemisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Members Per Region", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -145,9 +158,15 @@ class MemisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Members Per Category", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -181,9 +200,15 @@ class MemisController extends Controller
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Members Per Status", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -216,10 +241,16 @@ class MemisController extends Controller
             ));
 
         $result = array_merge(['labels' => $labels], ['values' => $values], ['colors' => $randomColor], ['titles' => $titles]);
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Members Per Sex", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -242,11 +273,16 @@ class MemisController extends Controller
         $status_list = Member::get_status();
         $sex_list = Member::get_sex();
         $country_list = Member::get_countries();
-
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS Overall", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -274,11 +310,17 @@ class MemisController extends Controller
      * @return void
      */
     public function per_division(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'Members per Division',
-                      'log_ip_address' => $this->get_ip(), 
+                      'log_ip_address' => $ip, 
+                      'log_user_agent' => $os, 
+                      'log_browser' => $browser, 
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::per_division()');
 
@@ -294,11 +336,17 @@ class MemisController extends Controller
      * @return void
      */
     public function per_region(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'Members per Region', 
-                      'log_ip_address' => $this->get_ip(),
+                      'log_ip_address' => $ip,
+                      'log_user_agent' => $os,
+                      'log_browser' => $browser,
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::per_region()');
 
@@ -314,11 +362,17 @@ class MemisController extends Controller
      * @return void
      */
     public function per_category(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'Members per Category', 
-                      'log_ip_address' => $this->get_ip(),
+                      'log_ip_address' => $ip,
+                      'log_user_agent' => $os,
+                      'log_browser' => $browser,
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::per_category()');
 
@@ -334,11 +388,17 @@ class MemisController extends Controller
      * @return void
      */
     public function per_status(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'Members per Status', 
-                      'log_ip_address' => $this->get_ip(),
+                      'log_ip_address' => $ip,
+                      'log_user_agent' => $os,
+                      'log_browser' => $browser,
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::per_status()');
 
@@ -354,11 +414,17 @@ class MemisController extends Controller
      * @return void
      */
     public function per_sex(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'Members per Sex', 
-                      'log_ip_address' => $this->get_ip(),
+                      'log_ip_address' => $ip,
+                      'log_user_agent' => $os,
+                      'log_browser' => $browser,
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::per_sex()');
 
@@ -375,10 +441,16 @@ class MemisController extends Controller
      */
     public function all_members(Request $req){
         
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+        
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' => Auth::user()->email, 
                       'log_description' => 'All Members', 
-                      'log_ip_address' => $this->get_ip(),
+                      'log_ip_address' => $ip,
+                      'log_user_agent' => $os,
+                      'log_browser' => $browser,
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
                       'log_model' => 'Member::get_all_members()');
 
@@ -394,11 +466,17 @@ class MemisController extends Controller
      * @return void
      */
     public function get_awards(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Achievement Awards", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Member::get_awards()');
 
@@ -415,11 +493,17 @@ class MemisController extends Controller
      * @return void
      */
     public function get_gb(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Governing Board", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Member::get_gb()');
 
@@ -464,13 +548,33 @@ class MemisController extends Controller
         $abroad = Member::get_abroad();
         $no_region = Member::get_no_region();
         $no_stat = Member::get_no_status();
+        $no_emp = Member::get_no_employment();
+        $no_ctry = Member::get_no_country();
 
         $disc = array();
         $disc['ABROAD'] = $abroad;
         $disc['NO_REGION'] = $no_region;
         $disc['NO_STATUS'] = $no_stat;
+        $disc['NO_EMP'] = $no_emp;
+        $disc['NO_CTRY'] = $no_ctry;
+        
 
         return $disc;
+    }
+
+    public function get_disc_mem(Request $req){
+        
+        if($req->id == 1){
+            return Member::get_abroad();
+        }else if($req->id == 2){
+            return Member::get_no_region();
+        }else if($req->id == 3){
+            return Member::get_no_status();
+        }else if($req->id == 4){
+            return Member::get_no_employment();
+        }else{
+            return Member::get_no_country();
+        }
     }
 
     /**
@@ -614,13 +718,19 @@ class MemisController extends Controller
      *
      * @return void
      */
-    public function get_csf(){
+    public function get_csf($id){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
-        $csf = Member::get_csf();
+        $csf = Member::get_csf($id);
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_description' => "Graph : MEMIS : Customer Service Feedback", 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
@@ -645,6 +755,19 @@ class MemisController extends Controller
      */
     public function get_csf_list(){
         return Member::get_csf_list();
+    }
+
+    /**
+     * Get CSF from SKMS database
+     *
+     * @return void
+     */
+    public function get_csf_desc($id, $user){
+        return Member::get_csf_desc($id, $user);
+    }
+
+    public function get_csf_answers($user){
+        return Member::get_csf_answers($user);
     }
     
     /**

@@ -1,9 +1,13 @@
 @extends('layouts.app')
-<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top" >
+@section('content')
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top" >
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/home') }}">
-                    {{ config('app.name', 'Laravel') }}  
-                </a> <small class="text-muted">BETA: v1.0.0</small>
+                <a class="navbar-brand w-50" href="{{ url('/home') }}">
+                    <img src="{{URL::asset('storage/images/logos/nrcp.png')}}" height="8%" width="8%" >
+                    <img src="{{URL::asset('storage/images/logos/skms.png')}}" height="15%" width="15%" >
+                    <img src="{{URL::asset('storage/images/logos/execom.png')}}" height="8%" width="8%"  data-toggle="tooltip" data-placement="top" title="v1.10.11">
+                    <span class="font-weight-bold">{{ config('app.name', 'Laravel') }}</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -27,6 +31,7 @@
                                 </li>
                             @endif
                         @else
+                        <a href="" class="btn-link mt-2 mr-2" href="javascript:void(0);" id="show_adv_srch">Advanced Search</a>
                         <div class="form-group has-search mb-0">
                             <span class="fa fa-search text-dark form-control-feedback"></span>
                             <input type="text" class="form-control border border-dark" placeholder="Quick search" id="quick_search">
@@ -66,7 +71,7 @@
             </div>
         </nav>
         
-@section('content')
+
 <div class="container">
     @php if($count_feedback > 0 && Auth::user()->role == 1){ @endphp
     @php $msg = ($count_feedback == 1) ? 'New Feedback!' : 'New Feedbacks!'; @endphp
@@ -83,10 +88,42 @@
             </div>
         </div>
     @php } @endphp
+    <div class="row adv_srch" style="display:none;">
+        <div class="col-md-4 mb-4">
+                <!-- <div class="card text-white" style="background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/search.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
+                <div class="card text-white rounded shadow" style="background-color:#0d0d0d">
+                    <div class="card-body">
+                    <h5 class="font-weight-bold">Advanced Search 
+                    <span class="float-right"><small><a href="javascript:void(0);" id="hide_adv_srch" class="btn-link">Hide</a></small></span></h5>
+                    <!-- <form> -->
+                    <input type="text" class="form-control" placeholder="Type Keyword" id="search_keyword">
+                    Filters
+                    <select class="form-control" id="search_filter">
+                        <option value="0">Select System</option>
+                        <option value="1">Members</option>
+                        <option value="2">Basic Research</option>
+                        <option value="3">eJournal</option>
+                        <option value="4">Scientific Library</option>
+                        <option value="5">NRCPnet</option>
+                    </select>
+                    <span id="sub_option"></span>
+                    <span id="sub_option2"></span>
+                    <span id="search_result"></span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-outline-dark text-white"  id="clear_filter" >Clear Filter</button>
+                            <button type="button" class="btn btn-dark" id="search_button">Search</button>
+                        </div>
+                    </div>
+                    <!-- </form> -->
+                </div>
+            </div>
+        </div>
     <div class="row justify-content-center">
         <div class="col-md-4">
-            <!-- <div class="card text-white rounded" style="min-height:620px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/memisbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="min-height:620px;background-color:maroon">
+            <!-- <div class="card text-white rounded" style="min-height:750px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/memisbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
+            <div class="card text-white rounded shadow" style="min-height:750px;background-color:maroon">
                  <div class="card-body">
                     <div class="row">
                         <div class="col">
@@ -94,7 +131,7 @@
                                 <img class="mr-3" src="{{URL::asset('storage/images/logos/memis.png')}}" width="25%" height="25%" alt="MEMIS">
                                 <div class="media-body">
                                     <h5 class="mt-3 font-weight-bold">Membership Information System (MemIS)</h5>
-                                    A repository of profile of Filipino researchers, scholars, scientest and engineers.
+                                    A repository of profile of Filipino researchers, scholars, scientist and engineers.
                                 </div>
                             </div>
                         </div>
@@ -131,11 +168,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-1">
                                         <!-- <a href="memis/1" target="_blank" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph"> -->
-                                        <button type="button" onclick="basic_graph_memis('1','Per Division (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            
-                                            <span class="fas fa-chart-pie"></span></button>
+                                        <!-- <button type="button" onclick="basic_graph_memis('1','Per Division (Basic Bar Graph)')" class="btn btn-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph"> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_memis('1','Per Division (Basic Bar Graph)')" class="btn-link text-white shadow rounded "  data-toggle="tooltip" data-placement="top" title="View basic graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
+                                        <!-- </button> -->
                                         </div>
                                     </div>
                                 </span>
@@ -154,10 +191,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-2">
                                             <!-- <a href="memis/2" target="_blank" class="btn bg-white text-danger mt-1" role="button"  data-toggle="tooltip" data-placement="top" title="See quick graph""> -->
-                                            <button type="button" onclick="basic_graph_memis('2','Per Region (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                            <!-- <button type="button" onclick="basic_graph_memis('2','Per Region (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_memis('2','Per Region (Basic Bar Graph)')" class="btn-link text-white shadow rounded "  data-toggle="tooltip" data-placement="top" title="View bar graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -176,10 +214,11 @@
                                                 </div>
                                             </div>  
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-2">
                                             <!-- <a href="memis/3" target="_blank" class="btn bg-white text-danger mt-1" role="button"  data-toggle="tooltip" data-placement="top" title="See quick graph""> -->
-                                            <button type="button" onclick="basic_graph_memis('3','Per Category (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                            <!-- <button type="button" onclick="basic_graph_memis('3','Per Category (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_memis('3','Per Category (Basic Bar Graph)')" class="btn-link text-white shadow rounded "  data-toggle="tooltip" data-placement="top" title="View bar graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -198,10 +237,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-2">
                                             <!-- <a href="memis/4" target="_blank" class="btn bg-white text-danger mt-1" role="button"  data-toggle="tooltip" data-placement="top" title="See quick graph""> -->
-                                            <button type="button" onclick="basic_graph_memis('4','Per Status (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                            <!-- <button type="button" onclick="basic_graph_memis('4','Per Status (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_memis('4','Per Status (Basic Bar Graph)')" class="btn-link text-white shadow rounded "  data-toggle="tooltip" data-placement="top" title="View bar graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -220,10 +260,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-2">
                                             <!-- <a href="memis/5" target="_blank" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph""> -->
-                                            <button type="button" onclick="basic_graph_memis('5','Per Sex (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                            <!-- <button type="button" onclick="basic_graph_memis('5','Per Sex (Basic Bar Graph)')" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_memis('5','Per Sex (Basic Bar Graph)')" class="btn-link text-white shadow rounded "  data-toggle="tooltip" data-placement="top" title="View bar graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -236,7 +277,7 @@
                                                 NRCP Achievement Awardee</a>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2 pt-2">
                                             <!-- <a href="memis/6" target="_blank" class="btn bg-white text-danger mt-1" role="button" data-toggle="tooltip" data-placement="top" title="Click to view graph">
                                             <span class="fas fa-chart-pie"></span></a> -->
                                         </div>
@@ -291,15 +332,15 @@
                 </div>
                 <div class="card-footer text-center">
                     <a role="button" href="memis/0" target="_blank" class="btn btn-danger w-100 mb-2">Generate Graph <span class="fas fa-angle-right"></span></a>
-                    <button type="button" class="btn btn-secondary w-100" id="memis_csf">Customer Service Feedback <span class="fas fa-angle-right"></span></button>
+                    <button type="button" class="btn btn-dark w-100" onclick="view_csf_memis()"><span class="badge badge-danger">{{ count($csf_memis)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
                 <hr/>
                     <a href="https://skms.nrcp.dost.gov.ph/" target="_blank" class="btn-link text-white">skms.nrcp.dost.gov.ph/</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <!-- <div class="card text-white" style="min-height:620px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/brisbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="min-height:620px;background-color:#eea804">
+            <!-- <div class="card text-white" style="min-height:750px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/brisbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
+            <div class="card text-white rounded shadow" style="min-height:750px;background-color:#eea804">
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
@@ -323,9 +364,10 @@
                                                 <span class="badge badge-warning" style="font-size:20px;"> {{ $bris_proj }}</span> PROJECTS
                                             </a>
                                         </div>
-                                        <div class="col-sm-2"> 
-                                            <button type="button" onclick="basic_graph_bris('1','Projects (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                        <div class="col-sm-2 pt-2"> 
+                                            <!-- <button type="button" onclick="basic_graph_bris('1','Projects (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_bris('1','Projects (Basic Bar Graph)')" class="btn-link text-white shadow rounded\"  data-toggle="tooltip" data-placement="top" title="View basic graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -372,9 +414,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
-                                            <button type="button" onclick="basic_graph_bris('2','Nibras (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                        <div class="col-sm-2 pt-2">
+                                            <!-- <button type="button" onclick="basic_graph_bris('2','Nibras (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_bris('2','Nibras (Basic Bar Graph)')" class="btn-link text-white shadow rounded\"  data-toggle="tooltip" data-placement="top" title="View basic graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -394,9 +437,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2">
-                                            <button type="button" onclick="basic_graph_bris('3','Dost Agendas (Basic Bar Graph)')" class="btn bg-white text-warning mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                        <div class="col-sm-2 pt-2">
+                                            <!-- <button type="button" onclick="basic_graph_bris('3','Dost Agendas (Basic Bar Graph)')" class="btn bg-white text-warning mt-1" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_bris('3','Dost Agendas (Basic Bar Graph)')" class="btn-link text-white shadow rounded\"  data-toggle="tooltip" data-placement="top" title="View basic graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -407,9 +451,10 @@
                                                 <span class="badge badge-warning" style="font-size:20px;"> {{ $bris_prog }}</span> PROGRAMS
                                             </a>
                                         </div>
-                                        <div class="col-sm-2"> 
-                                            <button type="button" onclick="basic_graph_bris('4','Programs (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
-                                            <span class="fas fa-chart-pie"></span></button>
+                                        <div class="col-sm-2 pt-2"> 
+                                            <!-- <button type="button" onclick="basic_graph_bris('4','Programs (Basic Bar Graph)')" class="btn bg-white text-warning mt-2" role="button" data-toggle="tooltip" data-placement="top" title="See quick graph">
+                                            <span class="fas fa-chart-pie"></span></button> -->
+                                            <a href="javascript:void(0);" onclick="basic_graph_bris('4','Programs (Basic Bar Graph)')" class="btn-link text-white shadow rounded\"  data-toggle="tooltip" data-placement="top" title="View basic graph"><span class="fas fa-chart-bar shadow" style="font-size:26px"></span></a>
                                         </div>
                                     </div>
                                 </span>
@@ -418,8 +463,8 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a role="button" href="memis/0" target="_blank" class="btn btn-warning w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a>
-                    <!-- <button type="button" class="btn btn-secondary w-100 disabled">Customer Service Feedback <span class="fas fa-angle-right"></span></button> -->
+                    <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-warning w-100 mb-2 disabled" data-toggle="tooltip" data-placement="top" title="Sad">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                    <button type="button" class="btn btn-dark w-100" onclick="view_csf_bris()"><span class="badge badge-warning">{{ count($csf_bris)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
                 <hr/>
                 <a href="https://basicresearch.nrcp.dost.gov.ph/" target="_blank" class="btn-link text-white">basicresearch.nrcp.dost.gov.ph/</a>
                     <!-- <a href="bris" target="_blank" class="card-link" hidden>More Details</a> -->
@@ -427,8 +472,8 @@
             </div>
         </div>
         <div class="col-md-4">
-            <!-- <div class="card text-white" style="min-height:620px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/journalbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="min-height:620px;background-color:#000f74">
+            <!-- <div class="card text-white" style="min-height:750px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/journalbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
+            <div class="card text-white rounded shadow" style="min-height:750px;background-color:#000f74">
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
@@ -475,13 +520,19 @@
                                         <div class="col-sm-10 ">Most Search Topics</div>
                                     </div>
                                 </a>
-                                <a  onclick="ejournal('6','Most Type of Clients');" class="btn btn-link link-group-item list-group-item-action  text-white bg-transparent shadow">
+                                <a  onclick="ejournal('6','Full Text PDF Clients');" class="btn btn-link link-group-item list-group-item-action  text-white bg-transparent shadow">
                                     <div class="row">
                                         <div class="col-sm-2"><span class="badge badge-primary" style="font-size:20px;"> {{ $count_clients }}</span></div>
-                                        <div class="col-sm-10 ">Most Type of Clients</div>
+                                        <div class="col-sm-10 ">Full Text PDF Clients</div>
                                     </div>
                                 </a>
-                                <a  onclick="ejournal('7','Visitors Origin','');" class="btn btn-link link-group-item list-group-item-action  text-white bg-transparent shadow">
+                                <a  onclick="ejournal('7','Citation Clients');" class="btn btn-link link-group-item list-group-item-action  text-white bg-transparent shadow">
+                                    <div class="row">
+                                        <div class="col-sm-2"><span class="badge badge-primary" style="font-size:20px;"> {{ $count_citees }}</span></div>
+                                        <div class="col-sm-10 ">Citation Clients</div>
+                                    </div>
+                                </a>
+                                <a  onclick="ejournal('8','Visitors Origin','');" class="btn btn-link link-group-item list-group-item-action  text-white bg-transparent shadow">
                                     <div class="row">
                                         <div class="col-sm-2"><span class="badge badge-primary" style="font-size:20px;"> {{ $count_visitors }}</span></div>
                                         <div class="col-sm-10 ">Visitors Origin</div>
@@ -492,10 +543,10 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a role="button" href="memis/0" target="_blank" class="btn btn-primary w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a>
-                    <button type="button" class="btn btn-secondary w-100 disabled">Customer Service Feedback <span class="fas fa-angle-right"></span></button>
+                    <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-primary w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                    <button type="button" class="btn btn-dark w-100" onclick="view_csf_ej()"><span class="badge badge-primary">{{ count($csf_ej)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
                 <hr/>
-                    <a href="https://researchjournal.nrcp.dost.gov.ph/" target="_blank" class="btn-link text-white">researchjournal.nrcp.dost.gov.ph/L</a>
+                    <a href="https://researchjournal.nrcp.dost.gov.ph/" target="_blank" class="btn-link text-white">researchjournal.nrcp.dost.gov.ph/</a>
                     <!-- <a href="ejournal" target="_blank" class="card-link" hidden hidden>More Details</a> -->
                 </div>
             </div>
@@ -504,7 +555,7 @@
     <div class="row justify-content-center mt-4">
         <div class="col-md-4">
             <!-- <div class="card text-white" style="min-height:370px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/lmsbg.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="min-height:620px;background-color:#006203">
+            <div class="card text-white rounded shadow" style="min-height:750px;background-color:#007503">
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
@@ -512,7 +563,7 @@
                                 <img class="mr-3" src="{{URL::asset('storage/images/logos/lms.png')}}" width="25%" height="25%" alt="LMS">
                                 <div class="media-body">
                                     <h5 class="mt-0 font-weight-bold">Library Management System (LMS)</h5>
-                                    A repository of terminal reports of research projects funded by the NRCP, policy briefs, monographs and other resources.
+                                    <small>A repository of terminal reports of research projects funded by the NRCP, policy briefs, monographs and other resources.</small>
                                 </div>
                             </div>
                         </div>
@@ -533,8 +584,8 @@
                     </div> 
                 </div>
                 <div class="card-footer text-center">
-                    <a role="button" href="memis/0" target="_blank" class="btn btn-success w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a>
-                    <button type="button" class="btn btn-secondary w-100 disabled">Customer Service Feedback <span class="fas fa-angle-right"></span></button>
+                    <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-success w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                    <button type="button" class="btn btn-dark w-100"  onclick="view_csf_lms()"><span class="badge badge-success">{{ count($csf_lms)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
                 <hr/>
                 <a href="https://scientificlibrary.nrcp.dost.gov.ph/" target="_blank" class="btn-link text-white">scientificlibrary.nrcp.dost.gov.ph/</a>
                     <!-- <a href="lms" target="_blank" class="card-link" hidden>More Details</a> -->
@@ -542,94 +593,214 @@
             </div>
         </div>
         <div class="col-md-4">
-            <!-- <div class="card text-white" style="min-height:370px;background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/nrcpnet.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="background-color:#077478">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <div class="media">
-                                <img class="mr-3" src="{{URL::asset('storage/images/logos/nrcpnet.png')}}" width="29%" height="29%" alt="NRCPNET">
-                                <div class="media-body">
-                                    <h5 class="mt-0 font-weight-bold">NRCPNET</h5>
-                                    Description here...
+            <div class="row">
+                <div class="col">
+                    <div class="card text-white rounded shadow" style="background-color:#077478">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="media">
+                                        <img class="mr-3" src="{{URL::asset('storage/images/logos/nrcpnet.png')}}" width="29%" height="29%" alt="NRCPNET">
+                                        <div class="media-body">
+                                            <h5 class="mt-0 font-weight-bold">NRCPNET</h5>
+                                            Description here...
+                                        </div>
+                                    </div> 
                                 </div>
-                            </div> 
-                        </div>
-                        </div>
-                    <div class="row mt-2">
-                        <div class="col pr-0 pl-0">
-                            <div class="list-group list-group-flush">
-                                <a  onclick="nrcpnet(1, '`Plantilla` Personnels')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
-                                    <div class="row">
-                                        <div class="col-sm-2"><span class="badge badge-info" style="font-size:20px;"> {{ $count_plant }}</span></div>
-                                        <div class="col-sm-10 ">Plantilla Personnel</div>
-                                    </div>
-                                </a>
-                                <a  onclick="nrcpnet(2, 'Contractual Personnels')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
-                                    <div class="row">
-                                        <div class="col-sm-2"><span class="badge badge-info" style="font-size:20px;"> {{ $count_cont }}</span></div>
-                                        <div class="col-sm-10 ">Contractual Personnel</div>
-                                    </div>
-                                </a>
-                                <a  onclick="nrcpnet(3, 'Job Orders')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
-                                    <div class="row">
-                                        <div class="col-sm-2"><span class="badge badge-info" style="font-size:20px;"> {{ $count_jo }}</span></div>
-                                        <div class="col-sm-10 ">Job Order</div>
-                                    </div>
-                                </a>
-                                <a  onclick="nrcpnet(4, 'Vacant Positions')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
-                                    <div class="row">
-                                        <div class="col-sm-2"><span class="badge badge-info" style="font-size:20px;"> {{ $count_vac }}</span></div>
-                                        <div class="col-sm-10 ">Vacant Position</div>
-                                    </div>
-                                </a>
+                            </div>
+                        <div class="row mt-2">
+                            <div class="col pr-0 pl-0">
+                                <div class="list-group list-group-flush">
+                                    <a  onclick="nrcpnet(1, 'Plantilla Personnels')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="badge badge-light" style="font-size:20px;"> {{ $count_plant }}</span></div>
+                                            <div class="col-sm-10 ">Plantilla Personnel</div>
+                                        </div>
+                                    </a>
+                                    <a  onclick="nrcpnet(2, 'Contractual Personnels')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="badge badge-light" style="font-size:20px;"> {{ $count_cont }}</span></div>
+                                            <div class="col-sm-10 ">Contractual Personnel</div>
+                                        </div>
+                                    </a>
+                                    <a  onclick="nrcpnet(3, 'Job Orders')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="badge badge-light" style="font-size:20px;"> {{ $count_jo }}</span></div>
+                                            <div class="col-sm-10 ">Job Order</div>
+                                        </div>
+                                    </a>
+                                    <a  onclick="nrcpnet(4, 'Vacant Positions')" class="btn btn-link list-group-item list-group-item-action text-white bg-transparent shadow">
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="badge badge-light" style="font-size:20px;"> {{ $count_vac }}</span></div>
+                                            <div class="col-sm-10 ">Vacant Position</div>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer text-center">
-                    <a role="button" href="memis/0" target="_blank" class="btn btn-info w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a>
-                    <!-- <button type="button" class="btn btn-secondary w-100 disabled">Customer Service Feedback <span class="fas fa-angle-right"></span></button> -->
-             
-                </div>
+                    <div class="card-footer text-center">
                 
-                    <!-- <a href="lms" target="_blank" class="card-link" hidden>More Details</a> -->
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="card rounded shadow text-white" style="background-color:#1D85C1">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="mt-0 font-weight-bold">RDLIP: Research Dissemination in Local and International Platforms</h5>  
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col pr-0 pl-0">
+                                    <div class="list-group list-group-flush">
+                                        <a  onclick="rdlip(1, 'Paper Presentation')" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-info text-white" style="font-size:20px;"> {{ $count_paper }}</span></div>
+                                                <div class="col-sm-10 ">Paper Presentation</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="rdlip(2, 'Publication Grant')" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-info text-white" style="font-size:20px;"> {{ $count_pub }}</span></div>
+                                                <div class="col-sm-10 ">Publication</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-info w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                            <button type="button" class="btn btn-dark w-100" onclick="view_csf_rdlip()"><span class="badge badge-info">{{ count($csf_rdlip)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
+                            <hr/>
+                                <a href="https://skms.nrcp.dost.gov.ph/rdlip" target="_blank" class="btn-link text-white">skms.nrcp.dost.gov.ph/rdlip</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <!-- <div class="card text-white" style="background-image:linear-gradient(0deg, rgba(29,29,29,1) 10%, rgba(29,29,29,0.5) 100%),url('{{URL::asset('storage/images/bg/search.jpeg')}}');background-size:cover; background-repeat:no-repeat"> -->
-            <div class="card text-white rounded shadow" style="background-color:#0d0d0d">
-                <div class="card-body">
-                <h5 class="font-weight-bold">Advanced Search</h5>
-                <!-- <form> -->
-                <input type="text" class="form-control" placeholder="Type Keyword" id="search_keyword">
-                Filters
-                <select class="form-control" id="search_filter">
-                    <option value="0">Select System</option>
-                    <option value="1">Members</option>
-                    <option value="2">Basic Research</option>
-                    <option value="3">eJournal</option>
-                    <option value="4">Scientific Library</option>
-                    <option value="5">NRCPnet</option>
-                </select>
-                <span id="sub_option"></span>
-                <span id="sub_option2"></span>
-                <span id="search_result"></span>
-                </div>
-                <div class="card-footer">
-                    <div class="btn-group w-100">
-                        <button type="button" class="btn btn-outline-dark text-white"  id="clear_filter" >Clear Filter</button>
-                        <button type="button" class="btn btn-dark" id="search_button">Search</button>
+            <div class="row">
+                <div class="col">
+                    <div class="card text-dark rounded shadow">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="media">
+                                        <div class="media-body">
+                                            <h5 class="mt-0 font-weight-bold">SKMS: Thesis and Dissertation</h5>
+                                            Applications
+                                        </div>
+                                    </div> 
+                                </div>
+                                </div>
+                            <div class="row mt-2">
+                                <div class="col pr-0 pl-0">
+                                    <div class="list-group list-group-flush">
+                                        <a  onclick="thds(1, 'Thesis Applications')" class="btn btn-link list-group-item list-group-item-action text-dark bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ $count_ths }}</span></div>
+                                                <div class="col-sm-10 ">Thesis</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="thds(2, 'Dissertation Applications')" class="btn btn-link list-group-item list-group-item-action text-dark bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ $count_dis }}</span></div>
+                                                <div class="col-sm-10 ">Dissertation</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="thds(3, 'Approved Thesis and Dissertation Applications')" class="btn btn-link list-group-item list-group-item-action text-dark bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ $count_app_thds }}</span></div>
+                                                <div class="col-sm-10 ">Approved</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="thds(4, 'Disapproved Thesis and Dissertation Applications')" class="btn btn-link list-group-item list-group-item-action text-dark bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ $count_dis_thds }}</span></div>
+                                                <div class="col-sm-10 ">Disapproved</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-dark w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                            <button type="button" class="btn btn-dark w-100" onclick="view_csf_thds()"><span class="badge badge-secondary">{{ count($csf_thds)}}</span> Customer Service Feedback <span class="fas fa-angle-right"></span></button>
+                    
+                        </div>
+                        
+                            <!-- <a href="lms" target="_blank" class="card-link" hidden>More Details</a> -->
                     </div>
                 </div>
-                <!-- </form> -->
+            </div>
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="card rounded shadow bg-secondary text-white">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="mt-0 font-weight-bold">Customer Service Feedback</h5>  
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col pr-0 pl-0">
+                                    <div class="list-group list-group-flush">
+                                        <a  onclick="view_csf_memis()" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ count($csf_memis) }}</span></div>
+                                                <div class="col-sm-10 ">NRCP Membership Application</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="view_csf_bris()" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ count($csf_bris) }}</span></div>
+                                                <div class="col-sm-10 ">Research Grant (Grants-In-Aid)</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="view_csf_ej()" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ count($csf_ej) }}</span></div>
+                                                <div class="col-sm-10 ">Journal Service</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="view_csf_lms()" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ count($csf_lms) }}</span></div>
+                                                <div class="col-sm-10 ">Library Service</div>
+                                            </div>
+                                        </a>
+                                        <a  onclick="view_csf_thds()" class="btn btn-link list-group-item list-group-item-action bg-transparent shadow">
+                                            <div class="row">
+                                                <div class="col-sm-2"><span class="badge badge-dark" style="font-size:20px;"> {{ count($csf_thds) }}</span></div>
+                                                <div class="col-sm-10 ">Thesis/Dissertation Manuscript Grant</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <!-- <a role="button" href="memis/0" target="_blank" class="btn btn-info w-100 mb-2 disabled">Generate Graph <span class="fas fa-angle-right"></span></a> -->
+                            <button type="button" class="btn btn-dark w-100" onclick="view_csf_overall()">Overall CSF <span class="fas fa-angle-right"></span></button>
+                    
+                        </div>
+                        
+                            <!-- <a href="lms" target="_blank" class="card-link" hidden>More Details</a> -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!--members modal -->
-<div class="modal fade" id="member_modal" tabindex="-1" role="dialog" style="z-index: 1600;">
+<div class="modal fade" id="member_modal" tabindex="-1" role="dialog" style="z-index: 1600;" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -640,7 +811,7 @@
             </div>
             <div class="modal-body table-responsive">
                 <span></span>
-                <table class="table table-striped w-100" id="member_table">
+                <table class="table table-hover w-100" id="member_table">
                 <thead>
                 </thead>
                 <tbody>
@@ -649,13 +820,16 @@
                 </tfoot>
                 </table>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
 <!-- /.members modal -->
 
 <!--ejournal modal -->
-<div class="modal fade" id="ejournal_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="ejournal_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -665,7 +839,7 @@
                 </button>
             </div>
             <div class="modal-body table-responsive">
-                <table class="table table-striped w-100  " id="ejournal_table">
+                <table class="table table-hover w-100  " id="ejournal_table">
                 <thead>
                 </thead>
                 <tbody>
@@ -680,7 +854,7 @@
 <!-- /.ejournal modal -->
 
 <!-- library modal -->
-<div class="modal fade" id="library_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="library_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -690,7 +864,7 @@
                 </button>
             </div>
             <div class="modal-body table-responsive">
-                <table class="table table-striped w-100  " id="library_table">
+                <table class="table table-hover w-100  " id="library_table">
                 <thead>
                 </thead>
                 <tbody>
@@ -705,7 +879,7 @@
 <!-- /.library modal -->
 
 <!-- nrcpnet modal -->
-<div class="modal fade" id="nrcpnet_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="nrcpnet_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -715,7 +889,7 @@
                 </button>
             </div>
             <div class="modal-body table-responsive">
-                <table class="table table-striped w-100  " id="nrcpnet_table">
+                <table class="table table-hover w-100  " id="nrcpnet_table">
                 <thead>
                 </thead>
                 <tbody>
@@ -727,10 +901,10 @@
         </div>
     </div>
 </div>
-<!-- /.library modal -->
+<!-- /.nrcpnet modal -->
 
 <!-- bris project modal -->
-<div class="modal fade" id="bris_modal" tabindex="-1" role="dialog"  style="z-index: 1600;">
+<div class="modal fade" id="bris_modal" tabindex="-1" role="dialog"  style="z-index: 1600;" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -740,7 +914,7 @@
                 </button>
             </div>
             <div class="modal-body table-responsive">
-                <table class="table table-striped w-100 " id="bris_table">
+                <table class="table table-hover w-100 " id="bris_table">
                 <thead>
                 </thead>
                 <tbody>
@@ -754,10 +928,57 @@
 </div>
 <!-- /.bris project modal -->
 
+<!-- thds modal -->
+<div class="modal fade" id="thds_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body table-responsive">
+                <table class="table table-hover w-100  " id="thds_table">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.thds modal -->
 
-
+<!-- rdlip modal -->
+<div class="modal fade" id="rdlip_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body table-responsive">
+                <table class="table table-hover w-100  " id="rdlip_table">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.rdlip modal -->
 <!-- result modal -->
-<div class="modal fade" id="result_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="result_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -773,13 +994,16 @@
                 <div class="accordion mt-2" id="result_accordion">
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
-<!-- /.library modal -->
+<!-- /.result modal -->
 
 <!-- users modal -->
-<div class="modal fade" id="users_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="users_modal" tabindex="-1" role="dialog"  data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -801,13 +1025,14 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active p-1 pt-4" id="users" role="tabpanel">
-                        <table class="table table-striped table-hovered" id="execom_table">
+                        <table class="table table-hover table-hovered" id="execom_table">
                             <thead>
                                 <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Role</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -841,10 +1066,10 @@
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="password" name="password" placeholder="Enter strong password">
                                         <div class="input-group-append" >
-                                            <button type="button" id="show_password_add_user" class="btn btn-light border border-secondary" ><span class="fa fa-eye icon"></span></button>
+                                            <button type="button" id="show_password_add_user" class="btn btn-secondary" ><span class="fa fa-eye icon text-white"></span></button>
                                         </div>
                                     </div>
-                                    <div class="hidden result"><span id="result"></span></div>
+                                    <div class="hidden result w-100"><span id="result"></span></div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -865,7 +1090,7 @@
                             </div>
                             <div class="float-right">
                                 <button type="button" class="btn btn-outline-secondary"  data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Create</button>
+                                <button type="submit" class="btn btn-primary create-execom-user">Create</button>
                             </div>
                         </form>
                     </div>
@@ -878,7 +1103,7 @@
                     </li>
                 </ul>
                 <div class="p-1">
-                    <table class="table table-striped table-hovered" id="skms_table">
+                    <table class="table table-hover table-hovered" id="skms_table">
                         <thead>
                             <tr>
                             <th scope="col">#</th>
@@ -901,6 +1126,82 @@
 </div>
 <!-- /.user modal -->
 
+<!-- edit users modal -->
+<div class="modal fade" id="edit_user_modal" tabindex="-1" role="dialog"  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><span class="fas fa-user-friends"></span> Edit user</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="edit_user_form">
+            @csrf
+            <input type="hidden" id="user_id" name="user_id">
+            <div class="form-group row">
+                <label for="name" class="col-sm-3 col-form-label text-right font-weight-bold">Name</label>
+                <div class="col-sm-9">
+                <input type="text"  class="form-control" id="name" name="name" placeholder="ex. Juan Dela Cruz">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="email" class="col-sm-3 col-form-label text-right font-weight-bold">Email</label>
+                <div class="col-sm-9">
+                <input type="email"  class="form-control" id="email" name="email" placeholder="juandelacruz@email.com">
+                </div>
+            </div>
+            <div class="form-group row">
+                
+                <label for="password" class="col-sm-3 col-form-label text-right font-weight-bold">New Password</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter strong password">
+                        <div class="input-group-append" >
+                            <button type="button" id="show_password_edit_user" class="btn btn-secondary" ><span class="fa fa-eye icon text-white"></span></button>
+                        </div>
+                    </div>
+                    <div class="hidden result w-100"><span id="result"></span></div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="repeatPassword" class="col-sm-3 col-form-label text-right font-weight-bold">Repeat New Password</label>
+                <div class="col-sm-9">
+                <input type="password" class="form-control" id="repeat_password" name="repeat_password" placeholder="Repeat password">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="role" class="col-sm-3 col-form-label text-right font-weight-bold">Role</label>
+                <div class="col-sm-9">
+                    <select class="form-control" id="role" name="role">
+                        <option value="">Select Role</option>
+                        <option value="1">Superadmin</option>
+                        <option value="2">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="status" class="col-sm-3 col-form-label text-right font-weight-bold">Status</label>
+                <div class="col-sm-9">
+                    <select class="form-control" id="status" name="status">
+                        <option value="1">Activated</option>
+                        <option value="2">Deactivated</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-danger remove-execom-user"  data-dismiss="modal">Delete account</button>
+            <div class="float-right">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary update-execom-user">Save changes</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.edit user modal -->
+
 <!-- logs modal -->
 <div class="modal fade" id="logs_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-xl">
@@ -911,20 +1212,28 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <table class="table table-striped" id="logs_table">
-            <thead>
-            <th>#</th>
-            <th>Email</th>
-            <th>Activity</th>
-            <th>Date</th>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+      <div class="modal-body table-responsive">
+        <!-- <div class="table-responsive"> -->
+            <table class="table table-hover w-100" id="logs_table">
+                <thead>
+                <th>#</th>
+                <th>Email</th>
+                <th>Activity</th>
+                <th>IP Address</th>
+                <th>Operating System</th>
+                <th>Browser</th>
+                <th>Date</th>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        <!-- </div> -->
       </div>
       <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-primary">Clear Logs</button> -->
+        <div class="btn-group mr-auto" role="group" aria-label="Basic example">
+            <a type="button" class="btn btn-outline-danger" href="{{ url('backup/clear_with_export_logs') }}" target="_blank">Clear Logs with Backup</a>
+            <a type="button" class="btn btn-outline-secondary" href="{{ url('backup/export_logs') }}" target="_blank">Backup Only</a>
+        </div>
         <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
@@ -933,7 +1242,7 @@
 <!-- /.logs modal -->
 
 <!-- overall result modal -->
-<div class="modal fade" id="overall_modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="overall_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -978,8 +1287,8 @@
                                 </div>
 
                                 <div id="memis_members" class="collapse" data-parent="#memis_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="memis_members_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="memis_members_table">
                                             <thead>
                                                 <th>#</th>       
                                                 <th>Title</th>
@@ -988,11 +1297,13 @@
                                                 <th>Middle Name</th>
                                                 <th>Sex</th>
                                                 <th>Contact</th>
-                                                <th>Email</th>
+                                                <th>Email</th> 
+                                                <th>Division</th> 
                                                 <th>Region</th>
                                                 <th>Province</th>
                                                 <th>City</th>
                                                 <th>Barangay</th>
+                                                <th>Status</th>
                                             </thead>
                                             <tbody></tbody>
                                         </table> 
@@ -1006,8 +1317,8 @@
                                     </button>
                                 </div>
                                 <div id="memis_specializations" class="collapse" data-parent="#memis_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="memis_spec_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="memis_spec_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1017,10 +1328,12 @@
                                                 <th>Sex</th>
                                                 <th>Contact</th>
                                                 <th>Email</th>
+                                                <th>Division</th>
                                                 <th>Specialization</th>
                                                 <th>Region</th>
                                                 <th>Province</th>
                                                 <th>City</th>
+                                                <th>Status</th>
                                             </thead>
                                             <tbody></tbody>
                                         </table> 
@@ -1034,8 +1347,8 @@
                                     </button>
                                 </div>
                                 <div id="memis_awards" class="collapse" data-parent="#memis_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100 table-responsive" id="memis_awards_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="memis_awards_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1046,6 +1359,7 @@
                                                 <th>Division</th>
                                                 <th>Award Year</th>
                                                 <th>Citation</th>
+                                                <th>Status</th>
                                             </thead>
                                             <tbody></tbody>
                                         </table> 
@@ -1059,8 +1373,8 @@
                                     </button>
                                 </div>
                                 <div id="memis_gbs" class="collapse" data-parent="#memis_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100 table-responsive" id="memis_gbs_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="memis_gbs_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1069,7 +1383,8 @@
                                                 <th>Middle Name</th>
                                                 <th>Sex</th>
                                                 <th>GB Position</th>
-                                                <th>Year Covered</th>
+                                                <th>Period From</th>
+                                                <th>Period To</th>
                                                 <th>Remarks</th>
                                             </thead>
                                             <tbody></tbody>
@@ -1091,8 +1406,8 @@
                                 </div>
 
                                 <div id="bris_projects" class="collapse" data-parent="#bris_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="bris_project_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="bris_project_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1117,8 +1432,8 @@
                                     </button>
                                 </div>
                                 <div id="bris_programs" class="collapse" data-parent="#bris_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="bris_program_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="bris_program_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1167,8 +1482,8 @@
                                 </div>
 
                                 <div id="ejournal_titles" class="collapse" data-parent="#ejournal_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="ejournal_title_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="ejournal_title_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1188,8 +1503,8 @@
                                     </button>
                                 </div>
                                 <div id="ejournal_authors" class="collapse" data-parent="#ejournal_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="ejournal_author_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="ejournal_author_table">
                                             <thead>
                                                 <th></th>
                                                 <th>Title</th>
@@ -1218,8 +1533,8 @@
                                     </button>
                                 </div>
                                 <div id="lms_{{ $values->cat_id }}" class="collapse" data-parent="#lms_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="lms_{{ $i }}_table"> 
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="lms_{{ $i }}_table"> 
                                             <thead>
                                                 <th>#</th>
                                                 <th>Title</th>
@@ -1248,8 +1563,8 @@
                                 </div>
 
                                 <div id="nrcpnet_employees" class="collapse" data-parent="#nrcpnet_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="nrcpnet_employee_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="nrcpnet_employee_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Last name</th>
@@ -1271,8 +1586,8 @@
                                     </button>
                                 </div>
                                 <div id="nrcpnet_divisions" class="collapse" data-parent="#ejournal_accordion">
-                                    <div class="card-body p-1 table-responsive">
-                                        <table class="table table-striped w-100" id="nrcpnet_division_table">
+                                    <div class="card-body p-3 table-responsive">
+                                        <table class="table table-hover w-100" id="nrcpnet_division_table">
                                             <thead>
                                                 <th>#</th>
                                                 <th>Last name</th>
@@ -1290,6 +1605,9 @@
                     </div>
                     <!-- /.ejournal tab -->
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -1406,7 +1724,7 @@
         <hr/>
         <div class="row">
             <div class="col-12 table-responsive">
-                <table class="table table-striped" id="feedback_table">
+                <table class="table table-hover" id="feedback_table">
                     <thead>
                         <tr>
                         <th scope="col">#</th>
@@ -1431,7 +1749,6 @@
   </div>
 </div>
 <!-- /.feedbacks chart and list modal -->
-
 
 <!-- database modal -->
 <div class="modal fade" id="database_modal">
@@ -1471,7 +1788,7 @@
                     <option value="sql">SQL</option>
                     <option value="csv">CSV</option>
                 </select> -->
-                <table id="sd_table" class="table table-striped mt-3 table-sm table-bordered">
+                <table id="sd_table" class="table table-hover mt-3 table-sm table-bordered">
                         <thead>
                             <tr>
                             <th scope="col">Table</th>
@@ -1556,7 +1873,7 @@
 <!-- /.database modal -->
 
 <!-- basic graph modal -->
-<div class="modal fade" id="basic_graph_modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="basic_graph_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -1584,10 +1901,9 @@
 </div>
 <!-- /.basic graph modal -->
 
-
-<!-- csf graph modal -->
-<div class="modal fade" id="csf_graph_modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<!-- csf graph modal memis -->
+<div class="modal fade" id="csf_graph_memis_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title"></h5>
@@ -1596,31 +1912,74 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="w-100" id="csf_chart"></div>
-        <table class="table table-striped w-100" id="csf_table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Sex</th>
-                        <th>Date submitted</th>
-                        <!-- <th>Action</th> -->
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Sex</th>
-                        <th>Date submitted</th>
-                        <!-- <th>Action</th> -->
-                    </tr>
-                </tfoot>
-        </table>
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="memis_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="memis_csf_list_tab" data-toggle="tab" href="#memis_csf_list" role="tab" aria-controls="memis_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="memis_csf_graph_tab" data-toggle="tab" href="#memis_csf_graph" role="tab" aria-controls="memis_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="memis_tab_content">
+            <div class="tab-pane fade show active" id="memis_csf_list" role="tabpanel" aria-labelledby="memis_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_memis_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Sex</th>
+                                    <th>Email</th>
+                                    <th>Age</th>
+                                    <th>Position</th>
+                                    <th>Institution</th>
+                                    <th>Region</th>
+                                    <th>Division</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="memis_csf_graph" role="tabpanel" aria-labelledby="memis_csf_graph_tab">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="memis_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="memis_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="memis_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="memis_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="memis_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -1628,8 +1987,717 @@
     </div>
   </div>
 </div>
-<!-- /.csf graph modal -->
+<!-- /.csf graph modal memis -->
 
+<!-- csf graph modal bris -->
+<div class="modal fade" id="csf_graph_bris_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="bris_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="bris_csf_list_tab" data-toggle="tab" href="#bris_csf_list" role="tab" aria-controls="bris_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="bris_csf_graph_tab" data-toggle="tab" href="#bris_csf_graph" role="tab" aria-controls="bris_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="bris_tab_content">
+            <div class="tab-pane fade show active" id="bris_csf_list" role="tabpanel" aria-labelledby="bris_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_bris_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Email</th>
+                                    <th>Sex</th>
+                                    <th>Age</th>
+                                    <!-- <th>Position</th> -->
+                                    <th>Institution</th>
+                                    <th>Region</th>
+                                    <th>Division</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="bris_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="bris_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="bris_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="bris_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="bris_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="bris_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal bris-->
+
+<!-- csf graph modal ej -->
+<div class="modal fade" id="csf_graph_ej_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="ej_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="ej_csf_list_tab" data-toggle="tab" href="#ej_csf_list" role="tab" aria-controls="ej_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="ej_csf_graph_tab" data-toggle="tab" href="#ej_csf_graph" role="tab" aria-controls="ej_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="ej_tab_content">
+            <div class="tab-pane fade show active" id="ej_csf_list" role="tabpanel" aria-labelledby="ej_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_ej_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Sex</th>
+                                    <th>Email</th>
+                                    <th>Affiliation</th>
+                                    <th>Country</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="ej_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="ej_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="ej_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="ej_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="ej_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="ej_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal ej -->
+
+<!-- csf graph modal lms -->
+<div class="modal fade" id="csf_graph_lms_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="lms_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="lms_csf_list_tab" data-toggle="tab" href="#lms_csf_list" role="tab" aria-controls="lms_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="lms_csf_graph_tab" data-toggle="tab" href="#lms_csf_graph" role="tab" aria-controls="lms_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="lms_tab_content">
+            <div class="tab-pane fade show active" id="lms_csf_list" role="tabpanel" aria-labelledby="lms_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_lms_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <!-- <th>Age</th> -->
+                                    <th>Sex</th>
+                                    <th>Email</th>
+                                    <th>Affiliation</th>
+                                    <th>Country</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="lms_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="lms_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="lms_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="lms_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="lms_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="lms_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal lms -->
+
+<!-- csf graph modal thds -->
+<div class="modal fade" id="csf_graph_thds_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="thds_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="thds_csf_list_tab" data-toggle="tab" href="#thds_csf_list" role="tab" aria-controls="thds_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="thds_csf_graph_tab" data-toggle="tab" href="#thds_csf_graph" role="tab" aria-controls="thds_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="thds_tab_content">
+            <div class="tab-pane fade show active" id="thds_csf_list" role="tabpanel" aria-labelledby="thds_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_thds_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Sex</th>
+                                    <th>Email</th>
+                                    <th>Age</th>
+                                    <th>Position</th>
+                                    <th>Institution</th>
+                                    <th>Region</th>
+                                    <th>Division</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="thds_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="thds_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="thds_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="thds_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="thds_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="thds_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal thds -->
+
+<!-- csf graph modal rdlip -->
+<div class="modal fade" id="csf_graph_rdlip_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="rdlip_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="rdlip_csf_list_tab" data-toggle="tab" href="#rdlip_csf_list" role="tab" aria-controls="rdlip_csf_list" aria-selected="true">CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="rdlip_csf_graph_tab" data-toggle="tab" href="#rdlip_csf_graph" role="tab" aria-controls="rdlip_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="rdlip_tab_content">
+            <div class="tab-pane fade show active" id="rdlip_csf_list" role="tabpanel" aria-labelledby="rdlip_csf_list_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="csf_rdlip_table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Sex</th>
+                                    <th>Email</th>
+                                    <th>Age</th>
+                                    <th>Position</th>
+                                    <th>Institution</th>
+                                    <th>Region</th>
+                                    <th>Division</th>
+                                    <th>Date submitted</th>
+                                    @foreach($csf_desc as $row)
+                                    <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                    @endforeach
+                                    <!-- <th>Action</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="rdlip_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col-8">
+                        <div class="w-100 bg-secondary shadow mt-3" id="rdlip_csf_chart"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="w-100 bg-secondary shadow mt-3" id="rdlip_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="rdlip_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="rdlip_csf_chart4"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="rdlip_csf_chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal rdlip -->
+
+<!-- csf graph modal skms -->
+<div class="modal fade" id="csf_graph_skms_modal" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark" role="alert">
+            <a href="#" class="alert-link">5</a> - Very Satisfied
+            <a href="#" class="alert-link ml-3">4</a> - Satisfied
+            <a href="#" class="alert-link ml-3">3</a> - Neither Satisfied nor Dissatisfied
+            <a href="#" class="alert-link ml-3">2</a> - Dissatisfied
+            <a href="#" class="alert-link ml-3">1</a> - Very Dissatisfied
+        </div>
+        <ul class="nav nav-tabs" id="overall_nav_tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class=" font-weight-bold nav-link active" id="overall_csf_list_tab" data-toggle="tab" href="#overall_csf_list" role="tab" aria-controls="overall_csf_list" aria-selected="true">Overall CSF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="font-weight-bold nav-link" id="overall_csf_graph_tab" data-toggle="tab" href="#overall_csf_graph" role="tab" aria-controls="overall_csf_graph" aria-selected="false">Graph</a>
+            </li>
+        </ul>
+        <div class="tab-content p-1" id="overall_tab_content">
+            <div class="tab-pane fade show active" id="overall_csf_list" role="tabpanel" aria-labelledby="overall_csf_list_tab">
+                
+                <ul class="nav nav-tabs" id="overall_nav_sub_tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link active" id="ov_skms_csf_list_tab" data-toggle="tab" href="#ov_skms_csf_list" role="tab" aria-controls="ov_skms_csf_list" aria-selected="true">All Systems</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link" id="ov_memis_csf_list_tab" data-toggle="tab" href="#ov_memis_csf_list" role="tab" aria-controls="ov_memis_csf_list" aria-selected="true">NRCP Membership Application 
+                            <span class="badge badge-danger">{{ count($csf_memis)}}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link" id="ov_bris_csf_list_tab" data-toggle="tab" href="#ov_bris_csf_list" role="tab" aria-controls="ov_bris_csf_list" aria-selected="true">Research Grant (Grant-in-Aid) 
+                            <span class="badge badge-warning">{{ count($csf_bris)}}</span></a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link" id="ov_ej_csf_list_tab" data-toggle="tab" href="#ov_ej_csf_list" role="tab" aria-controls="ov_ej_csf_list" aria-selected="true">Journal Service 
+                            <span class="badge badge-primary">{{ count($csf_ej)}}</span></a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link" id="ov_lms_csf_list_tab" data-toggle="tab" href="#ov_lms_csf_list" role="tab" aria-controls="ov_lms_csf_list" aria-selected="true">Library Service 
+                            <span class="badge badge-success">{{ count($csf_lms)}}</span></a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class=" font-weight-bold nav-link" id="ov_thds_csf_list_tab" data-toggle="tab" href="#ov_thds_csf_list" role="tab" aria-controls="ov_thds_csf_list" aria-selected="true">Thesis/Dissertation Manuscript Grant 
+                            <span class="badge badge-dark">{{ count($csf_thds)}}</span></a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-1" id="overall_tab_sub_content">
+                    <div class="tab-pane fade show active" id="ov_skms_csf_list" role="tabpanel" aria-labelledby="ov_skms_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ov_memis_csf_list" role="tabpanel" aria-labelledby="ov_memis_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_memis_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ov_bris_csf_list" role="tabpanel" aria-labelledby="ov_bris_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_bris_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ov_ej_csf_list" role="tabpanel" aria-labelledby="ov_ej_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_ej_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ov_lms_csf_list" role="tabpanel" aria-labelledby="ov_lms_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_lms_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ov_thds_csf_list" role="tabpanel" aria-labelledby="ov_thds_csf_list_tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover w-100" id="csf_skms_thds_table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Sex</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Position</th>
+                                            <th>Institution</th>
+                                            <th>Region</th>
+                                            <th>Division</th>
+                                            <th>Date submitted</th>
+                                            @foreach($csf_desc as $row)
+                                            <th>{{ $row->svc_fdbk_q_desc }}</th>
+                                            @endforeach
+                                            <!-- <th>Action</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="overall_csf_graph" role="tabpanel" >
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="overall_csf_chart"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="overall_csf_chart2"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="overall_csf_chart3"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="w-100 bg-secondary shadow mt-3" id="overall_csf_chart4"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="overall_adv_csf" role="tabpanel" aria-labelledby="overall_adv_csf_tab">
+                <div class="table-responsive">
+                    <table class="table table-hover w-100" id="adv_csf_table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Very Satisfied</th>
+                                    <th>Satisified</th>
+                                    <th>Neither Satisfied nor Dissatisfied</th>
+                                    <th>Dissatisfied</th>
+                                    <th>Very Dissatisfied</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.csf graph modal skms -->
 @endsection
 
     

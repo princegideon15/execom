@@ -10,12 +10,17 @@ use App\Logs;
 use Auth;
 use Response;
 use Storage;
+use Browser;
 
 /**
  * Manages LMS data
  */
 class LmsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     private $ipaddress;
 
@@ -79,11 +84,17 @@ class LmsController extends Controller
     public function categories(Request $req){
 
         $cat = Library::get_cat_label($req->cat);
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
         
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "View {$cat}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Library::get_category()');
 
@@ -112,10 +123,16 @@ class LmsController extends Controller
         $name = substr($file_path, strrpos($file_path, '/') + 1);
         Storage::put($name, $contents);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Download {$cat} ({$file})", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Library::get_file()');
 
@@ -145,10 +162,16 @@ class LmsController extends Controller
         $name = substr($file_path, strrpos($file_path, '/') + 1);
         Storage::put($name, $contents);
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Viewed {$cat} ({$file})", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Library::get_file()');
 
@@ -165,6 +188,49 @@ class LmsController extends Controller
         'Content-Disposition' => 'inline; filename="'.$file.'"'
 
         ]);
+    }
+
+    /**
+     * Get CSF from BRIS database
+     *
+     * @return void
+     */
+    public function get_csf_list(){
+        return Library::get_csf_list();
+    }
+
+    public function get_csf_desc($id, $user){
+        return Library::get_csf_desc($id, $user);
+    }
+
+    public function get_csf_answers($user){
+        return Library::get_csf_answers($user);
+    }
+
+    /**
+     * Get Customer service feedback
+     *
+     * @return void
+     */
+    public function get_csf($id){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $csf = Library::get_csf($id);
+
+        $logs = array('log_user_id' => Auth::id(), 
+        'log_email' => Auth::user()->email, 
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_description' => "Graph : Library : Customer Service Feedback", 
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
+
+        Logs::create($logs);
+
+        return $csf;
     }
 
     /**

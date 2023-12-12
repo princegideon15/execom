@@ -19,7 +19,7 @@
                                 <p>For protection, please enter the One-Time PIN that has been sent to <strong>{{ $mail }}</strong>.
                                 The code will expire in <strong>5 minutes</strong>.</p>
                                 <div class="form-group mt-3">    
-                                    <input type="text" class="form-control form-control-lg @error('otp') is-invalid @enderror"
+                                    <input type="text" class="form-control form-control-lg text-center @error('otp') is-invalid @enderror"
                                            id="otp" 
                                            name="otp" 
                                            placeholder="6-digit OTP"
@@ -33,11 +33,14 @@
 
                                 </div>
 
-                                <button type="submit" class="btn btn-dark">Submit</button>
-                                <button type="button" id="resend_login_otp" class="btn btn-outline-dark">Resend OTP via email</button>
+                                <button type="submit" class="btn btn-dark w-100">Submit OTP</button>
+                                <div class="mt-3">
+                                    <small class="btn-link font-weight-bold text-underline"><a href="javascript:void(0);" id="resend_login_otp"><span class="oi oi-caret-left"></span> Resend OTP via email</a></small>
+                                </div>
+                                <!-- <a type="button" id="resend_login_otp" class="btn-link small">Resend OTP via email</a> -->
 
                                 @if ($message = $errors->first('error'))
-                                <div class="text-danger pt-2">
+                                <div class="text-danger mt-3">
                                     <strong><span class="fas fa-exclamation-circle"></span>  {{ $message }}</strong>
                                 </div>
                                 @endif
@@ -45,7 +48,12 @@
                             </form>
                         </div>
                         <div class="col-5 p-5" style="background-color:white;opacity:.9;min-height:350px">
-                            <hr class="mt-5">
+                        <div class="d-flex justify-content-center align-items-center">
+                                <img src="{{URL::asset('storage/images/logos/nrcp.png')}}" class="mt-2" height="30%" width="30%">
+                                <img src="{{URL::asset('storage/images/logos/skms.png')}}" class=" " height="50%" width="50%">
+                                <img src="{{URL::asset('storage/images/logos/execom.png')}}" class=" " height="30%" width="30%">
+                            </div>
+                            <hr>
                             <h1>ExeCom IS</h1>
                             <h6>Provide the management with quick view of data or information that surround the core functions of NRCP.</h6>
                             <hr>

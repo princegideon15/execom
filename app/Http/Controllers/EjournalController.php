@@ -7,12 +7,18 @@ use Illuminate\Http\Request;
 use App\Ejournal;
 use App\Logs;
 use Auth;
+use Browser;
 
 /**
  * Manages eJournal data
  */
 class EjournalController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     private $ipaddress;
 
     /**
@@ -93,11 +99,17 @@ class EjournalController extends Controller
      * Get published articles
      */
     public function published_articles(){
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
         
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'EJOURNAL Published Articles', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_published_articles()');
 
@@ -113,10 +125,16 @@ class EjournalController extends Controller
      */
     public function cited_articles(){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'EJOURNAL Cited Articles', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_cited_articles()');
 
@@ -132,10 +150,16 @@ class EjournalController extends Controller
      */
     public function viewed_articles(){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'EJOURNAL viewed Articles', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_viewed_articles()');
 
@@ -151,10 +175,16 @@ class EjournalController extends Controller
      */
     public function downloaded_articles(){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'EJOURNAL Downloaded Articles', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_downloaded_articles()');
 
@@ -240,16 +270,22 @@ class EjournalController extends Controller
     }
 
     /**
-     * Get clients info who dowbloaded article full text pdf
+     * Get clients info who downloaded article full text pdf
      *
      * @return void
      */
     public function most_clients(){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
-        'log_description' => 'EJOURNAL Most Type of Clients', 
-        'log_ip_address' => $this->get_ip(),
+        'log_description' => 'EJOURNAL Full Text PDF Clients', 
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_most_clients()');
 
@@ -259,22 +295,101 @@ class EjournalController extends Controller
     }
 
     /**
+     * Get citees info who cited article 
+     *
+     * @return void
+     */
+    public function most_citees(){
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $logs = array('log_user_id' => Auth::id(), 
+        'log_email' => Auth::user()->email, 
+        'log_description' => 'EJOURNAL List of Citees', 
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
+        'log_model' => 'Ejournal::get_citees()');
+
+        Logs::create($logs);
+
+        return Ejournal::get_citees();
+    }
+
+    /**
      * Get client's location when they visited the website
      *
      * @return void
      */
     public function visitors_origin(){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => 'EJOURNAL Visitors Origin', 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ ,
         'log_model' => 'Ejournal::get_visitors_origin()');
 
         Logs::create($logs);
 
         return Ejournal::get_visitors_origin();
+    }
+
+     /**
+     * Get CSF from ejournal database
+     *
+     * @return void
+     */
+    public function get_csf_list(){
+        return Ejournal::get_csf_list();
+    }
+
+    /**
+     * Get CSF from ejournal database
+     *
+     * @return void
+     */
+    public function get_csf_desc($id, $user){
+        return Ejournal::get_csf_desc($id, $user);
+    }
+
+    public function get_csf_answers($user){
+        return Ejournal::get_csf_answers($user);
+    }
+
+    /**
+     * Get Customer service feedback
+     *
+     * @return void
+     */
+    public function get_csf($id){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $csf = Ejournal::get_csf($id);
+
+        $logs = array('log_user_id' => Auth::id(), 
+        'log_email' => Auth::user()->email, 
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_description' => "Graph : eJournal : Customer Service Feedback", 
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
+
+        Logs::create($logs);
+
+        return $csf;
     }
     
 

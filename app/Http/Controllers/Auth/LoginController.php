@@ -123,7 +123,9 @@ class LoginController extends Controller
      */
     public function doLogin(Request $req){
         // get info of user by email
-        $recipient = $req->email;
+        $user_email = $req->email;
+        $admin = 'nrcp.execom@gmail.com';
+
         $userdata = array(
             'email' => $req->email,
             'password'  => $req->password,
@@ -160,6 +162,31 @@ class LoginController extends Controller
         }
 
         if ($validator->fails()) {
+
+            $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+            $browser = Browser::browserName();
+            $name = 'Unknown';
+            $date = date("F j, Y, g:i a");
+            $ip = $this->get_ip();
+
+            $logs = array('log_user_id' => 0, 
+                          'log_email' => $req->email, 
+                          'log_ip_address' => $ip,
+                          'log_user_agent' => $os,
+                          'log_browser' => $browser,
+                          'log_description' => 'Login attempt (Account Unregistered)', 
+                          'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
+
+            Logs::create($logs);
+
+            $data = array('title' => 'Login Attempt', 'name' => $name, 'user_email' => $user_email, 'admin' => $admin, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip);
+
+            Mail::send('auth.loginmail', $data, function($message) use ($admin, $name, $user_email) {
+                $message->to($admin, $name)->subject
+                    ('ExeCom IS Login Attempt Information');
+                $message->from('nrcp.execom@gmail.com','ExeCom IS Admin');
+            });
+
             return redirect()->back()->withErrors($validator)->withInput();
         }else{
 
@@ -173,7 +200,7 @@ class LoginController extends Controller
             $att = Cookie::forget('attempts');
             
             $name =  Auth::user()->name;
-            $crypt_rec = Crypt::encrypt($recipient);
+            $crypt_rec = Crypt::encrypt($user_email);
 
             // generate OTP
             session()->regenerate();
@@ -182,10 +209,11 @@ class LoginController extends Controller
             $otp_timestamp = Carbon::now()->timestamp;
             session(['session_timestamp' => $otp_timestamp]);
             session(['session_otp' => $otp]);
+            session(['session_email' => $req->email]);
 
             // send OTP in the user's email
-            Mail::send('auth.otpmail',$data, function($message) use ($recipient, $name) {
-                $message->to($recipient, $name)->subject
+            Mail::send('auth.otpmail',$data, function($message) use ($user_email, $name) {
+                $message->to($user_email, $name)->subject
                     ('ExeCom IS One-Time PIN (OTP)');
                 $message->from('nrcp.execom@gmail.com','ExeCom IS Admin');
             });
@@ -215,23 +243,27 @@ class LoginController extends Controller
             
             $this->incrementLoginAttempts($req);
 
+            $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+            $browser = Browser::browserName();
+            $name = Execom::where('email', $user_email)->value('name');
+            $date = date("F j, Y, g:i a");
+            $ip = $this->get_ip();
+
             $logs = array('log_user_id' => Auth::id(), 
                           'log_email' => $req->email, 
-                          'log_ip_address' => $this->get_ip(),
+                          'log_ip_address' => $ip,
+                          'log_user_agent' => $os,
+                          'log_browser' => $browser,
                           'log_description' => 'Login attempt', 
                           'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
 
             Logs::create($logs);
 
-            $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
-            $browser = Browser::browserName();
-            $name = Execom::where('email', $recipient)->value('name');
-            $date = date("F j, Y, g:i a");
-            $ip = $this->get_ip();
-            $data = array('title' => 'Login Attempt', 'name' => $name, 'recipient' => $recipient, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip);
+           
+            $data = array('title' => 'Login Attempt', 'name' => $name, 'user_email' => $user_email, 'admin' => $admin, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip);
 
-            Mail::send('auth.loginmail', $data, function($message) use ($recipient, $name) {
-                $message->to($recipient, $name)->subject
+            Mail::send('auth.loginmail', $data, function($message) use ($admin, $name) {
+                $message->to($admin, $name)->subject
                     ('ExeCom IS Login Attempt Information');
                 $message->from('nrcp.execom@gmail.com','ExeCom IS Admin');
             });
@@ -282,6 +314,10 @@ class LoginController extends Controller
      */
     public function verify_otp(Request $req){
 
+        
+        $admin = 'nrcp.execom@gmail.com';
+        $user_email = session('session_email');
+
         $validator = Validator::make($req->all(), [
             'otp' => 'required|min:6'
         ], $this->otp_messages());
@@ -310,16 +346,6 @@ class LoginController extends Controller
 
                     // get user info for logs
                     $recipient = 'nrcp.execom@gmail.com';
-                    $logs = array('log_user_id' => Auth::id(), 
-                    'log_email' => $recipient, 
-                    'log_ip_address' => $this->get_ip(),
-                    'log_user_agent' => Browser::platformFamily() . ' ' . Browser::platFormVersion(),
-                    'log_browser' => Browser::browserName(),
-                    'log_description' => 'Login', 
-                    'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
-
-                    // save log
-                    Logs::create($logs);
 
                     // get browser info and other user info
                     $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
@@ -327,12 +353,26 @@ class LoginController extends Controller
                     $name = Auth::user()->name;
                     $date = date("F j, Y, g:i a");
                     $ip = $this->get_ip();
-                    $data = array('title' => 'Login Success', 'name' => $name, 'recipient' => $recipient, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip);
+
+                    $logs = array('log_user_id' => Auth::id(), 
+                    'log_email' => $user_email, 
+                    'log_ip_address' => $ip,
+                    'log_user_agent' => $os,
+                    'log_browser' => $browser,
+                    'log_description' => 'Login', 
+                    'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
+
+                    // save log
+                    Logs::create($logs);
+
+                    
+                    $data = array('title' => 'Login Success', 'name' => $name, 'recipient' => $recipient, 'admin' => $admin, 'os' => $os, 'browser' => $browser, 'date' => $date, 'ip' => $ip, 'user_email' => $user_email);
 
                     // send info to gmail of execom
-                    Mail::send('auth.loginmail', $data, function($message) use ($recipient, $name) {
-                        $message->to($recipient, $name)
-                        ->cc(['gerard_balde@yahoo.com','gerardbalde15@gmail.com'])->subject
+                    Mail::send('auth.loginmail', $data, function($message) use ($admin, $name, $user_email) {
+                        $message->to($admin, 'ExeCom IS Admin')
+                        // ->bcc(['nrcp.execom@gmail.com','gerardbalde15@gmail.com'])->subject
+                        ->bcc(['gerardbalde15@gmail.com'])->subject
                             ('ExeCom IS Login Information');
                         $message->from('nrcp.execom@gmail.com','ExeCom IS Admin');
                     });
@@ -386,9 +426,17 @@ class LoginController extends Controller
      * @return void
      */
     public function logout(){
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+
         $logs = array('log_user_id' => Auth::id(), 
                       'log_email' =>  Auth::user()->email,
-                      'log_ip_address' => $this->get_ip(), 
+                      'log_ip_address' => $ip, 
+                      'log_user_agent' => $os, 
+                      'log_browser' => $browser, 
                       'log_description' => 'Logout', 
                       'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'::'. __FUNCTION__);
 

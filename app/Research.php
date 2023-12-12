@@ -294,11 +294,12 @@ class Research extends Model
 
     static function get_project_status($status){
         $query = DB::connection('dbbris')->table('tblproject_details')
-        ->select('prd_title', 'prd_duration', 
+        ->select('prd_title', 'prd_duration', 'prd_date_created',
         DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prd_status) AS status'));
         
         $query->where('prd_proposal', 0);
-
+        //if proposal = proponent, if project = project leader
+        //add region, division, description(clicakble link), propoent, project leader
         if($status == 0){
 
             return $query->get();
@@ -311,7 +312,7 @@ class Research extends Model
 
     static function get_nibra_by_id($id){
         return DB::connection('dbbris')->table('tblproject_details')
-        ->select('prd_title', 'tblproject_details.prd_date_created', 'prd_proponent_id AS proponent',
+        ->select('prd_title', 'prd_date_created', 'prd_proponent_id AS proponent',
         DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prd_status) AS status'))
         ->join('tblconcerned_areas', 'prd_id', '=', 'ca_proj_id')
         ->where('prd_proposal', 0)
@@ -323,7 +324,7 @@ class Research extends Model
 
 
         return DB::connection('dbbris')->table('tblconcerned_areas')
-        ->select('prd_title', 'tblproject_details.prd_date_created', 'prd_proponent_id AS proponent',
+        ->select('prd_title', 'tblproject_details.date_created', 'prd_proponent_id AS proponent',
         DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prd_status) AS status'))
         ->join('tbldost_agenda', 'ca_dost_agenda', '=', 'dost_agenda_id')
         ->join('tblproject_details', 'prd_id', '=', 'ca_proj_id')
@@ -335,11 +336,11 @@ class Research extends Model
 
     static function get_program_status($status){
 
-        // return DB::connection('dbbris')->table('tblprograms')
-        // ->select('prg_title', 'date_created', 'prg_coordinator_id AS proponent', 'prg_duration',
-        // DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prg_program_status) AS status'))
-        // ->where('prg_proposal', 0)
-        // ->get();   
+        return DB::connection('dbbris')->table('tblprograms')
+        ->select('prg_title', 'date_created', 'prg_coordinator_id AS proponent', 'prg_duration',
+        DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prg_program_status) AS status'))
+        ->where('prg_proposal', 0)
+        ->get();   
         
        
         $query = DB::connection('dbbris')->table('tblprograms')
@@ -351,9 +352,11 @@ class Research extends Model
         if($status == 0){
 
             return $query->get();
+            // return $query->last_query();
         }else{
             $query->where('prg_program_status', $status);
 
+            // return $query->last_query();
             return $query->get();
         }
     }
@@ -361,7 +364,7 @@ class Research extends Model
     static function search_projects($keyword){
 
         return DB::connection('dbbris')->table('tblproject_details')
-        ->select('prd_proposal AS prp', 'prd_title AS title', 'prd_date_created', 'prd_proponent_id AS proponent', 
+        ->select('prd_proposal AS prp', 'prd_title AS title', 'prd_date_created as date_created', 'prd_proponent_id AS proponent', 
         DB::connection('dbbris')->raw('(select prs_name from tblproject_status where prs_id like prd_status) AS status'))
         ->where('prd_title', 'LIKE', '%' . $keyword . '%')
         ->get();
@@ -418,4 +421,186 @@ class Research extends Model
         ->groupBy('prs_id')
         ->get();  
     }
+
+    static function get_csf_list(){
+        
+        return DB::connection('dbbris')->table('tblservice_feedbacks')
+        ->join('tbl_csf_respondents','tbl_csf_respondents.fb_id','=','tblservice_feedbacks.fb_id')
+        ->join('new_dbskms.tblservice_feedback_questions','new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->join('tblsex','sx_id','=','tbl_csf_respondents.sex')
+        ->join('new_dbskms.tbldivisions','div_id','=','tbl_csf_respondents.sci_div', 'left')
+        ->join('new_dbskms.tblregions','region_id','=','tbl_csf_respondents.region', 'left')
+        ->select('tbl_csf_respondents.*', 'sx_sex', 'region_name', 'div_number')
+        ->where('new_dbskms.tblservice_feedback_questions.svc_fdbk_q_code', 'CSF-V2022')
+        ->groupBy('tbl_csf_respondents.fb_id')
+        ->get();
+    }
+
+    static function get_csf_answers($user_id){
+        return DB::connection('dbbris')->table('tblservice_feedbacks')
+        ->join('tbl_csf_respondents','tbl_csf_respondents.fb_id','=','tblservice_feedbacks.fb_id')
+        ->join('new_dbskms.tblservice_feedback_questions','new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->where('new_dbskms.tblservice_feedback_questions.svc_fdbk_q_code', 'CSF-V2022')
+        ->where('tbl_csf_respondents.fb_id', $user_id)
+        // ->groupBy('tbl_csf_respondents.fb_id')
+        ->get();
+    }
+
+    // get csf desc
+    static function get_csf_desc($id, $user){
+        return DB::connection('dbbris')->table('tblservice_feedbacks')
+        ->join('new_dbskms.tblservice_feedback_questions','new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id','=','tblservice_feedbacks.svc_fdbk_q_id')
+        ->join('tbl_csf_respondents','tbl_csf_respondents.fb_id','=','tblservice_feedbacks.fb_id')
+        ->select('tblservice_feedbacks.svc_fdbk_q_answer as rate')
+        ->where('svc_fdbk_q_order', $id)
+        ->where('svc_fdbk_q_code', 'CSF-V2022')
+        ->where('tbl_csf_respondents.fb_id', $user)
+        ->get();
+    }    
+
+    static function get_csf($id){
+        
+        if($id == 1){ // stacked bar category
+
+            $result_array = array();
+
+            $query = DB::connection('dbskms')->table('tblservice_feedback_ratings')
+            ->select('svc_fdbk_rating_id','svc_fdbk_rating')
+            ->where('svc_fdbk_rating', '!=', 'Yes')
+            ->where('svc_fdbk_rating', '!=', 'No')
+            ->orderBy('svc_fdbk_rating_id','asc')
+            ->get();
+            
+            foreach($query as $row){  
+                $result_array[] = array($row->svc_fdbk_rating_id => array($row->svc_fdbk_rating => Research::get_all_csf($row->svc_fdbk_rating_id)));
+            }
+
+            
+            return $result_array;
+
+        }else if($id == 2){ // pie sex 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            // $where .= ' AND pp_sex > 0 ';
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            // $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY tbl_csf_respondents.fb_id ';
+            $join .= ' JOIN dbbris.tblsex on sx_id = dbbris.tbl_csf_respondents.sex ';
+            // $join .= ' JOIN dbbris.tbl_csf_respondents on tbl_csf_respondents.fb_id =  tblservice_feedbacks.tblservice_feedbacks.fb_id ';
+                            
+            $sub_q .= 'SELECT sx_id, count(tbl_csf_respondents.fb_id) as total, sx_sex AS label '. 
+            'FROM dbbris.tbl_csf_respondents '. 
+            'JOIN dbbris.tblservice_feedbacks ON tblservice_feedbacks.fb_id = tbl_csf_respondents.fb_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = dbbris.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY sx_id ORDER BY sx_id desc';
+
+            return DB::select($select);
+
+        }else if($id == 3){ // bar region 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            // $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = tbl_csf_respondents.fb_id) '; 
+            // $where .= ' AND emp_period_to = "Present" '; 
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            // $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY tbl_csf_respondents.fb_id ';
+ 
+            // $join .= 'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = tbl_csf_respondents.fb_id ';
+            $join .= ' JOIN new_dbskms.tblregions on region_id = region ';
+
+            $sub_q .= 'SELECT count(tbl_csf_respondents.fb_id) as total, region_name as label, region_id '.
+            'FROM dbbris.tbl_csf_respondents '. 
+            'JOIN dbbris.tblservice_feedbacks ON tblservice_feedbacks.fb_id = tbl_csf_respondents.fb_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = dbbris.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY region_id';
+
+            return DB::select($select);
+
+        }else if($id == 4){ // bar age 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            // $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY tbl_csf_respondents.fb_id ';
+
+            $sub_q .= 'SELECT count(tbl_csf_respondents.fb_id) AS total, '.
+            'CASE  '.
+            'WHEN age BETWEEN 20 AND 31 then "1" '.
+            'WHEN age BETWEEN 30 AND 41 then "2" '.
+            'WHEN age BETWEEN 40 AND 51 then "3" '.
+            'WHEN age BETWEEN 50 AND 61 then "4" '.
+            'WHEN age BETWEEN 60 AND 71 then "5" '.
+            'ELSE "6" END AS "range" '. 
+            'FROM dbbris.tbl_csf_respondents '.
+            'JOIN dbbris.tblservice_feedbacks ON tblservice_feedbacks.fb_id = tbl_csf_respondents.fb_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = dbbris.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            $where . $group_by;
+
+            $select .= 'SELECT count(total) AS total, '. 
+            '(SELECT age_range FROM new_dbskms.tblage_ranges WHERE age_id = tmp.range) AS label FROM '. 
+            '( ' . $sub_q . ') AS tmp GROUP BY tmp.range';
+
+            return DB::select($select);
+        }else{ // bar affiliation 
+            
+            $where = ''; $group_by = ''; $join = ''; $sub_q = ''; $select = '';
+
+            // $where .= ' AND emp_period_to = (SELECT MAX(emp_period_to) FROM new_dbskms.tblemployments WHERE emp_usr_id = tbl_csf_respondents.fb_id) '; 
+            // $where .= ' AND emp_period_to = "Present" '; 
+            $where .= ' AND svc_fdbk_q_code LIKE "CSF-V2022" ';
+            $where .= ' AND svc_fdbk_q_order LIKE 1 ';
+            // $where .= ' AND svc_id LIKE 3 ';
+            $group_by .= ' GROUP BY tbl_csf_respondents.fb_id ';
+ 
+            // $join .= 'LEFT JOIN new_dbskms.tblemployments ON emp_usr_id = tbl_csf_respondents.fb_id ';
+ 
+            $join .= 'JOIN new_dbskms.tblaffiliation_type ON aff_type_id = svc_fdbk_q_answer ';
+            // $join .= ' JOIN new_dbskms.tblregions on region_id = region ';
+
+            $sub_q .= 'SELECT count(tbl_csf_respondents.fb_id) as total, aff_type as label, aff_type_id '.
+            'FROM dbbris.tbl_csf_respondents '. 
+            'JOIN dbbris.tblservice_feedbacks ON tblservice_feedbacks.fb_id = tbl_csf_respondents.fb_id '.
+            'JOIN new_dbskms.tblservice_feedback_questions ON new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id = dbbris.tblservice_feedbacks.svc_fdbk_q_id '. $join . 
+            ' '. $where . $group_by;
+
+            $select .= 'SELECT count(total) as total, label, aff_type_id FROM '. 
+            '( ' . $sub_q . ') as tmp GROUP BY aff_type_id';
+
+            return DB::select($select);
+        }  
+
+        
+        // 'INNER JOIN new_dbskms.tblusers ON usr_id = pp_usr_id '.
+        // 'LEFT JOIN new_dbskms.tblmembers ON mem_usr_id = usr_id '. 
+
+        
+    }
+
+    // all csf for graph
+    static function get_all_csf($id){
+        
+        // ->join('tbl_csf_respondents','tbl_csf_respondents.fb_id','=','tblservice_feedbacks.fb_id')
+        $query = DB::select('SELECT svc_fdbk_q_id, svc_fdbk_q, '. 
+        '(SELECT COUNT(*) FROM dbbris.tblservice_feedbacks '. 
+        'JOIN dbbris.tbl_csf_respondents on tbl_csf_respondents.fb_id =  tblservice_feedbacks.fb_id '.
+        'WHERE dbbris.tblservice_feedbacks.svc_fdbk_q_id '. 
+        'LIKE new_dbskms.tblservice_feedback_questions.svc_fdbk_q_id '. 
+        'AND svc_fdbk_q_answer LIKE '. $id .  
+        ') AS total '. 
+        'FROM new_dbskms.tblservice_feedback_questions '. 
+        'WHERE svc_fdbk_q_choices LIKE "1,2,3,4,5" AND svc_fdbk_q_code LIKE "CSF-V2022" ');
+        // ' AND svc_id LIKE 3'.
+        return $query;
+
+    }
+
 }

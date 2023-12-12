@@ -2,7 +2,7 @@ Hi {{ $name }},
 
 <p>Your One-Time PIN (OTP) is:</p>
 
-<h3>{{ $otp }}</h3>
+<h1>{{ $otp }}</h1>
 
 <p>Thank you for using ExeCom IS. This is a system generated message. Please do not reply.</p>
 

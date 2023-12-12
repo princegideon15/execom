@@ -11,12 +11,18 @@ use App\Nrcpnet;
 use App\Research;
 use App\Logs;
 use Auth;
+use Browser;
 
 /**
  * Manage quick and advance search
  */
 class SearchController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     private $ipaddress;
 
     /**
@@ -57,11 +63,17 @@ class SearchController extends Controller
         $keyword = $data['keyword'];
         $sys = $data['sys'];
         $section = $data['filter'];
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Quick Search > {$keyword}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -122,7 +134,7 @@ class SearchController extends Controller
             }else if($data['filter'] == 4){ //awards
                 
                 return Member::get_awards($keyword);
-            }else if($data['filter'] == 5){
+            }else if($data['filter'] == 5){ //gb
                 return Member::search_gb($keyword);
             }
     }
@@ -140,11 +152,17 @@ class SearchController extends Controller
         $keyword = $data['keyword'];
         $sys = $data['sys'];
         $section = $data['filter'];
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Quick Search > {$keyword}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -173,11 +191,17 @@ class SearchController extends Controller
         $keyword = $data['keyword'];
         $sys = $data['sys'];
         $section = $data['filter'];
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Quick Search > {$keyword}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -202,11 +226,17 @@ class SearchController extends Controller
         $keyword = $data['keyword'];
         $sys = $data['sys'];
         $section = $data['filter'];
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Quick Search > {$keyword}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -235,11 +265,17 @@ class SearchController extends Controller
         $keyword = $data['keyword'];
         $sys = $data['sys'];
         $section = $data['filter'];
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Quick Search > {$keyword}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -262,11 +298,17 @@ class SearchController extends Controller
 
         $keyword = $data['keyword'];
         $search = $req->keyword;
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::id(), 
         'log_email' => Auth::user()->email, 
         'log_description' => "Advanced Search > {$search}", 
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -348,11 +390,9 @@ class SearchController extends Controller
                 return Member::advanced_search_awardee($division, $year, $keyword);
 
             }else if($data['filter'] == 5){ // governing board
-                $division = ($data['division'] > 0) ? $data['division'] : null;
-                $year = ($data['year'] > 0) ? $data['year'] : null;
-
+                $division = (isset($data['division'])) ? $data['division'] : 0;
+                $year = (isset($data['year'])) ? $data['year'] : 0;
                 return Member::advanced_search_gb($division, $year, $keyword);
-
             }
             else{
 

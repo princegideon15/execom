@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\AccountCreated;
+use Illuminate\Support\Facades\Mail;
+ 
 use Hash;
 use App\Ejournal;
 use App\Library;
@@ -13,9 +16,12 @@ use App\Nrcpnet;
 use App\Execom;
 use App\Logs;
 use App\Feedback;
+use App\Thds;
+use App\Grant;
 use Cookie;
 use Auth;
 use App\Charts\FeedbackChart;
+use Browser;
 
 use \Colors\RandomColor;
 
@@ -24,6 +30,7 @@ use \Colors\RandomColor;
  */
 class HomeController extends Controller
 {
+    
 
     private $ipaddress;
 
@@ -70,6 +77,7 @@ class HomeController extends Controller
     {
         // ejournal
         $count_clients = Ejournal::count_clients();
+        $count_citees = Ejournal::count_citees();
         $count_journals = Ejournal::count_journals();
         $count_articles = Ejournal::count_articles();
         $count_downloads = Ejournal::count_downloads();
@@ -113,18 +121,41 @@ class HomeController extends Controller
 
         //feedback
         $count_feedback = Feedback::where('fb_notif', 0)->count();
+        $csf_desc = Feedback::get_csf_desc();
+
+        //thesis and dissertation
+        $count_ths = Thds::count_thd(1);
+        $count_dis = Thds::count_thd(2);
+        $count_app_thds = Thds::count_action_apps(2);
+        $count_dis_thds = Thds::count_action_apps(3);
+
+        // rdlip
+        $count_paper = Grant::count_paper_grant();
+        $count_pub = Grant::count_pub_grant();
+
+        // csf
+        $csf_memis = Member::get_csf_list();
+        $csf_bris = Research::get_csf_list();
+        $csf_ej = Ejournal::get_csf_list();
+        $csf_lms = Library::get_csf_list();
+        $csf_thds = Thds::get_csf_list();
+        $csf_rdlip = Grant::get_csf_list();
+
 
         //tables
         $tables = Library::get_tables();
  
-        return view('home', compact('count_journals', 'count_articles', 'count_downloads',
+        return view('home', compact('count_journals', 'count_articles', 'count_downloads', 'count_citees',
                                     'count_views', 'count_cites', 'count_visitors',
                                     'lms_articles', 'categories', 'count_clients',
                                     'bris_proj', 'bris_basic', 'bris_applied', 'bris_prog', 'nibras', 
                                     'ongoing', 'completed', 'terminated', 'extended','dost_agendas',
                                     'members', 'division', 'region', 'category', 'status', 'sex', 'position',
                                     'count_plant', 'count_jo', 'count_cont', 'count_vac',
-                                    'count_feedback', 'tables'));
+                                    'count_ths', 'count_dis', 'count_app_thds', 'count_dis_thds',
+                                    'csf_memis', 'csf_bris', 'csf_ej', 'csf_lms', 'csf_thds', 'csf_rdlip',
+                                    'count_feedback', 'tables', 'csf_desc',
+                                    'count_paper', 'count_pub'));
     }
 
     /**
@@ -132,27 +163,79 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function get_users(){
-        return Execom::get_users();
+    public function get_users($id = null){
+        return Execom::get_users($id);
     }
 
     /**
-     * Add user from MemIS members (disabled temporarily)
+     * Add execom user 
      *
      * @param Request $req
      * @return void
      */
     public function add_user(Request $req){
 
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
         $logs = array('log_user_id' => Auth::user()->user_id, 
         'log_email' =>  Auth::user()->email, 
         'log_description' => 'Added User',
-        'log_ip_address' => $this->get_ip(),
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
+
+        Logs::updateOrcreate($logs);
+        
+        // email nofitciation todo
+
+        return Execom::add_user($req->id);
+    }
+
+
+    /**
+     * update execom user 
+     *
+     * @param Request $req
+     * @return void
+     */
+    public function update_user(Request $req){
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $logs = array('log_user_id' => Auth::user()->user_id, 
+        'log_email' =>  Auth::user()->email, 
+        'log_description' => 'Updated User',
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
 
-        return Execom::add_user($req->id);
+        $data = array();
+        $where = array();
+
+        $model = new Execom;
+        $row = $model->getTableColumns('users');
+        foreach($row as $field){
+            if($field == 'password'){
+                if($req->input('password') != null){
+                    $data['password'] = Hash::make($req->password);
+                }else{
+                    $data[$field] = Execom::where('user_id', $req->input('user_id'))->value('password');
+                }
+            }else{
+                $data[$field] = $req->input($field);
+            }
+            $where['user_id'] = $req->input('user_id');
+        }
+
+        Execom::updateOrCreate($where, $data);
     }
 
     /**
@@ -162,11 +245,17 @@ class HomeController extends Controller
      * @return void
      */
     public function remove_user(Request $req){
+        
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
 
         $logs = array('log_user_id' => Auth::user()->user_id, 
         'log_email' =>  Auth::user()->email, 
         'log_description' => 'Removed User',
-        'log_ip_address' => $this->get_ip(), 
+        'log_ip_address' => $ip, 
+        'log_user_agent' => $os, 
+        'log_browser' => $browser, 
         'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
         Logs::updateOrcreate($logs);
@@ -182,10 +271,7 @@ class HomeController extends Controller
      */
     public function create_user(Request $req){
 
-   
-        
         $data = array();
-        // $password = Hash::make('yourpassword');
         $data['email'] = $req->email;
         $data['password'] = Hash::make($req->password);
         $data['name'] = $req->name;
@@ -198,22 +284,80 @@ class HomeController extends Controller
         if (Execom::where('email', $req->email)->count() > 0) {
             return '1';
          }else{
-            Execom::insert($data);
+            Execom::insert($data);            
+
+            $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+            $browser = Browser::browserName();
+            $ip = $this->get_ip();
             
             $logs = array('log_user_id' => Auth::user()->user_id,
+            'log_email' =>  Auth::user()->email, 
             'log_description' => 'Created new user',
-            'log_ip_address' => $this->get_ip(),
+            'log_ip_address' => $ip,
+            'log_user_agent' => $os,
+            'log_browser' => $browser,
             'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
 
             Logs::updateOrcreate($logs);
+            
+            $email_data = [ 'name' => $req->name,
+                            'email' => $req->email, 
+                            'password' => $req->password];
+
+            Mail::to($req->email)->send(new AccountCreated($email_data));
 
             return '2';
          }
+    }
 
+    public function send_email_test(){
 
+        $email_data = [ 'name' => 'Gerard Balde',
+        'email' => 'test@mail.com', 
+        'password' => 'test pass'];
+    
+         Mail::to('gerardbalde15@gmail.com')->send(new AccountCreated($email_data));
     }
     
     public function activity_logs(){
         return Logs::orderBy('created_at', 'desc')->get();
+    }
+
+    public function save_logs(Request $req){
+
+        $os = Browser::platformFamily() . ' ' . Browser::platFormVersion();
+        $browser = Browser::browserName();
+        $ip = $this->get_ip();
+
+        $logs = array('log_user_id' => Auth::user()->user_id, 
+        'log_email' =>  Auth::user()->email, 
+        'log_description' => $req->log,
+        'log_ip_address' => $ip,
+        'log_user_agent' => $os,
+        'log_browser' => $browser,
+        'log_controller' => str_replace('App\Http\Controllers\\','', __CLASS__) .'/'. __FUNCTION__ );
+
+        Logs::updateOrcreate($logs);
+    }
+
+    /**
+     * Get CSF from SKMS database
+     *
+     * @return void
+     */
+    public function get_csf_list(){
+        $member = Member::get_csf_list();
+        $research = Research::get_csf_list();
+        $ejournal = Ejournal::get_csf_list();
+        $library = Library::get_csf_list();
+        $thds = Thds::get_csf_list();
+
+        $result = array_merge(['memis' => $member], 
+                              ['bris' => $research],
+                              ['ej' => $ejournal],
+                              ['lms' => $library],
+                              ['thds' => $thds]);
+
+        return $result;
     }
 }
